@@ -9,7 +9,7 @@ const store = createStore({
       state.count++;
     },
     changeMessage(state) {
-      state.mensagem = "CHANGED";
+      state.mensagem = "Filipa";
     },
   },
   actions: {},
