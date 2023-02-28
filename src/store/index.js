@@ -1,9 +1,20 @@
 import { createStore } from "vuex";
+import createPersistedState from "vuex-persistedstate";
 
-export default createStore({
-  state: {},
+const store = createStore({
+  state: { count: 1, mensagem: "isto é um teste" },
   getters: {},
-  mutations: {},
+  mutations: {
+    increment(state) {
+      state.count++;
+    },
+    changeMessage(state) {
+      state.mensagem = "CHANGED";
+    },
+  },
   actions: {},
   modules: {},
+  plugins: [createPersistedState()],
 });
+
+export default store;
