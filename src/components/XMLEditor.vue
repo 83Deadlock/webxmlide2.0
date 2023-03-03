@@ -30,6 +30,9 @@ export default {
             this.content = code
             console.log("method updateContent -> " + this.content);
         },
+        fileUploaded(content) {
+            this.editor.setValue(content);
+        },
     },
     mounted() {
         const vm = this;
@@ -78,6 +81,7 @@ export default {
                 indentUnit: 2,
                 smartIndent: true,
                 foldGutter: true,
+                lineWrapping: true,
                 gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
                 extraKeys: {
                     "Ctrl-Q": function (cm) { cm.foldCode(cm.getCursor()); },
@@ -101,28 +105,24 @@ export default {
 
             editor.setValue(this.xml_code);
 
-            console.log("resolved");
+            //console.log("resolved");
         })
 
         console.log("editor object: ", editorPromise)
 
         editorPromise.then((editor) => {
-            console.log("inside then")
+            //console.log("inside then")
             editor.on('change', function () {
                 const newContent = editor.getValue();
                 vm.$store.commit('updateXMLCode', newContent);
-                console.log("stored")
+                //console.log("stored")
                 //localStorage.setItem('xml_code', newContent);
             });
         }).catch((error) => {
-            console.log("error")
             console.error(error);
         })
 
         console.log("test")
-
-
-        //this.editor.on("change", () => { this.content = this.editor.getValue() })
     }
 }
 </script>
@@ -131,4 +131,5 @@ export default {
 textarea {
     text-align: left;
 }
+
 </style>

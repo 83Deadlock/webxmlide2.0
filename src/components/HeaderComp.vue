@@ -40,7 +40,7 @@ nav {
 
 nav img {
   position: absolute;
-  left: 20px;
+  left: 30px;
   top: 20px;
   height: 40px;
 }
