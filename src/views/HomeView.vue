@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <XMLSide />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <HelloWorld />
   </div>
 </template>
 

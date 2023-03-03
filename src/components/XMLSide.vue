@@ -20,12 +20,15 @@
             <!--Hidden file input to handle responding to the button click on the upload button-->
             <input type="file" id="file_input" style="display: none;">
         </div>
+        <div class="xml-middle">
+            <XMLEditor />
+        </div>
     </div>
       
 </template>
 
 <script>
-    //import XMLEditor from './XMLEditor.vue'
+    import XMLEditor from './XMLEditor.vue'
 
     export default{
         name: 'XMLSide',
@@ -41,14 +44,12 @@
             },
         },
         components: {
-        //    XMLEditor
+            XMLEditor
         },
         methods: {
             fileNameOnBlur(){
-                //this.selectionStart = this.selectionEnd = 0;
                 const inputElement = this.$refs.input;
-
-      // Set the cursor position to the beginning of the inserted value
+                // Set the cursor position to the beginning of the inserted value
                 inputElement.setSelectionRange(0, 0);
             },
             showErrorMessage() {

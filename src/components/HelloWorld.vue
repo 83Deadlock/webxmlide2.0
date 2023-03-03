@@ -4,7 +4,7 @@
     <button @click="increment">Increment Count</button>
     <h1>Mensagem: {{ mensagem }}</h1>
     <button @click="changeMessage">Alterar Mensagem</button>
-    <h1>{{ msg }}</h1>
+    <button @click="resetMessage">Reset Mensagem</button>
   </div>
 </template>
 
@@ -14,10 +14,10 @@ import { mapState, mapMutations } from "vuex";
 export default {
   name: "HelloWorld",
   props: {
-    msg: String,
+
   },
   computed: mapState(["count", "mensagem"]),
-  methods: mapMutations(["increment", "changeMessage"]),
+  methods: mapMutations(["increment", "changeMessage", "resetMessage"]),
   mounted() {
     this.increment();
   },
@@ -26,6 +26,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.hello{
+  display: flex;
+}
 h3 {
   margin: 40px 0 0;
 }
@@ -39,5 +42,8 @@ li {
 }
 a {
   color: #42b983;
+}
+button{
+  z-index: 1000;
 }
 </style>
