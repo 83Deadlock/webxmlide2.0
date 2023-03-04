@@ -15,13 +15,31 @@
             </div>
             <div class="upload-download-buttons">
                 <button id="upload_button" type="button" @click="handleUploadButtonClick"><i class="fas fa-upload"></i></button>
-                <button id="download_button" type="button"><i class="fas fa-download"></i></button>
+                <button id="download_button" type="button" @click="handleDownloadButtonClick" :disabled="hasError"><i class="fas fa-download"></i></button>
             </div>
             <!--Hidden file input to handle responding to the button click on the upload button-->
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileInputChange" accept=".xml" />
         </div>
         <div class="xml-middle">
             <XMLEditor :xml-code="xmlCode"/>
+        </div>
+        <div class="xml-bottom">
+            <div class="hints">
+                <div class="hint-icon" @mouseenter="showHints" @mouseleave="hideHints">
+                    <i class="fa fa-question-circle"></i>
+                </div>
+                <div class="hints-box" :class="{ active: showHintsBox }">
+                    <div class="hint-text">
+                        <p>[Alt+Q] Fold at Cursor Level</p>
+                        <p>[Alt+X] Insert XML Declaration</p>
+                        <p>[Alt+I] Auto Indentation</p>
+                        <p>[Ctrl+Space] Code Suggestion</p>
+                    </div>
+                </div>
+            </div>
+            <div class="xml-status">
+                <button :class="{ 'well-formed': isWellFormed, 'not-well-formed': !isWellFormed }" :disabled="true">{{ buttonMessage }}</button>
+            </div>
         </div>
     </div>
 </template>
@@ -36,12 +54,22 @@ export default {
         return {
             inputValue: '',
             xmlCode: '',
+            showHintsBox: false,
         };
     },
     computed: {
-        ...mapState(["xml_filename"]),
+        ...mapState(["xml_filename","xml_code"]),
         hasError() {
             return this.inputValue && !this.inputValue.endsWith('.xml') && this.inputValue.length > 0;
+        },
+        isWellFormed() {
+            return this.checkXMLWellFormed(this.xml_code);
+        },
+        buttonMessage() {
+            return this.isWellFormed ? "Well-Formed XML" : "XML is not Well-Formed";
+        },
+        xmlCodeWatcher() {
+            return this.xml_code;
         },
     },
     components: {
@@ -49,6 +77,12 @@ export default {
     },
     methods: {
         ...mapMutations(["changeXMLFilename"]),
+        showHints(){
+            this.showHintsBox = true;
+        },
+        hideHints(){
+            this.showHintsBox = false;
+        },
         fileNameOnBlur() {
             const inputElement = this.$refs.input;
             this.$store.commit("changeXMLFilename", this.inputValue);
@@ -80,9 +114,47 @@ export default {
             };
             reader.readAsText(file);
         },
+        handleDownloadButtonClick(){
+            const code = this.xml_code;
+            var filename = this.inputValue;
+
+            if(filename == ''){
+                filename = 'Example.xml';
+            }
+
+            // Create a new blob from the XML code
+            const blob = new Blob([code], { type: 'text/xml' });
+
+            // Create a link element to download the file
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = window.URL.createObjectURL(blob);
+            link.click();
+        },
+        checkXMLWellFormed(xmlCode) {
+            const firstLine = xmlCode.split('\n')[0];
+            const isXmlDeclaration = /^\s*<\?xml\s/.test(firstLine);
+
+            if(!isXmlDeclaration){
+                return false;
+            }
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlCode, "application/xml");
+            const parseErrors = xmlDoc.getElementsByTagName("parsererror");
+            return parseErrors.length == 0;
+        },
     },
     mounted() {
         this.inputValue = this.xml_filename;
+    },
+    watch: {
+        xmlCodeWatcher(){
+            const xmlCode = this.xml_code;
+            if(xmlCode){
+                this.checkXMLWellFormed(xmlCode);
+            }
+        }
     }
 }
 </script>
@@ -100,11 +172,21 @@ export default {
     background-color: transparent;
     border: none;
     color: #bbbbbb;
-    transition: all 0.1s cubic-bezier(.25, .50, .75, 1);
+    transition: all 0.15s cubic-bezier(.25, .50, .75, 1);
 }
 
 #upload_button:hover,
 #download_button:hover {
+    color: #0092b2;
+    cursor: pointer;
+}
+
+#download_button:disabled {
+    color: #3c3c3c;
+    cursor: default;
+}
+
+#download_button:not([disabled]):hover {
     color: #0092b2;
     cursor: pointer;
 }
@@ -179,7 +261,7 @@ export default {
     /*padding-left: 30px;*/
     font-family: "Euclid";
 }
-
+/*
 #xml-status {
     background-color: #111111;
     padding: 10px;
@@ -198,12 +280,11 @@ export default {
     outline: 1px solid #111111;
     color: #111111;
 }
-
+*/
 #tip {
     font-size: 12px;
     color: #3c3c3c;
 }
-
 
 .error-icon,
 .success-icon {
@@ -236,5 +317,74 @@ export default {
 
 .error-icon {
     color: red;
+}
+
+.well-formed {
+  background-color: #0092b2;
+  color: #111111;
+  border: 1px solid #111111;
+}
+.not-well-formed {
+  background-color: #111111;
+  color: #0092b2;
+  border: 1px solid #0092b2;
+}
+button:disabled {
+  cursor: default;
+}
+
+.xml-status {
+    padding-top: 20px;
+}
+
+.xml-status > button{
+    font-family: "Euclid";
+    font-weight: lighter;
+    border-radius: 30px;
+    padding: 10px 20px;
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+}
+
+
+.hints {
+  display: inline-block;
+  position: relative;
+}
+
+.hint-icon {
+  display: inline-block;
+  color:#bbbbbb;
+  padding-top: 10px;
+  transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+}
+
+.hint-icon:hover {
+    color: #3c3c3c;
+}
+
+.hints-box {
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+  display: none;
+  position: absolute;
+  top: -120px;
+  left: -10px;
+  width: 180px;
+  white-space: pre-wrap;
+  padding: 5px;
+  border-radius: 0px;
+  background-color: #c7c7c7;
+  color: #111111;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.hints-box.active {
+  display: block;
+}
+
+.hint-text {
+  font-size: 12px;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
 }
 </style>

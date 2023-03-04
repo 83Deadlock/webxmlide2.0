@@ -100,9 +100,9 @@ export default {
                 lineWrapping: true,
                 gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
                 extraKeys: {
-                    "Ctrl-Q": function (cm) { cm.foldCode(cm.getCursor()); },
+                    "Alt-Q": function (cm) { cm.foldCode(cm.getCursor()); },
                     "Alt-X": insertXMLDecl,
-                    "Ctrl-I": function (cm) { cm.execCommand("indentAuto"); },
+                    "Alt-I": function (cm) { cm.execCommand("indentAuto"); },
                     "'<'": completeAfter,
                     "'/'": completeIfAfterLt,
                     "' '": completeIfInTag,
