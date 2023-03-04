@@ -13,7 +13,7 @@
     },
     methods: {
       onClick() {
-        console.log('btn-click');
+        //console.log('btn-click');
       },
     },
   }

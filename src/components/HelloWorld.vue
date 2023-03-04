@@ -1,8 +1,8 @@
 <template>
   <div class="hello">
-    <h1>Count: {{ count }}</h1>
+    <h3>Count: {{ count }}</h3>
     <button @click="increment">Increment Count</button>
-    <h1>Mensagem: {{ mensagem }}</h1>
+    <h3>Mensagem: {{ mensagem }}</h3>
     <button @click="changeMessage">Alterar Mensagem</button>
     <button @click="resetMessage">Reset Mensagem</button>
   </div>
@@ -28,22 +28,15 @@ export default {
 <style scoped>
 .hello{
   display: flex;
+  justify-content: space-between;
+  height: 50px;
+  width: 50%;
 }
 h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+  color: #bbbbbb
 }
 button{
-  z-index: 1000;
+  width: min-content;
+  height: min-content;
 }
 </style>

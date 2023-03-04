@@ -14,6 +14,20 @@ import { mapState, mapMutations } from "vuex";
 
 export default {
     name: 'XMLEditor',
+    props: {
+        xmlCode: {
+            type: String,
+            default: '',
+        }
+    },
+    watch: {
+        /*xmlCode() {
+            this.editorPromise.then((editor) => {
+                editor.setValue(this.xmlCode);
+            })
+            this.alertMe(this.xmlCode);
+        }*/
+    },
     components: {
 
     },
@@ -26,9 +40,11 @@ export default {
     computed: mapState(["xml_code"]),
     methods: {
         ...mapMutations(["updateXMLCode"]),
+        alertMe(xmlCode){
+            window.alert(xmlCode);
+        },
         updateContent(code) {
             this.content = code
-            console.log("method updateContent -> " + this.content);
         },
         fileUploaded(content) {
             this.editor.setValue(content);
@@ -96,34 +112,34 @@ export default {
                 hintOptions: { schemaInfo: tags }
             });
 
-
             resolve(editor);
 
-
             editor.setSize('100%', '100%');
-            //console.log(this.xml_code);
 
             editor.setValue(this.xml_code);
-
-            //console.log("resolved");
         })
 
-        console.log("editor object: ", editorPromise)
-
         editorPromise.then((editor) => {
-            //console.log("inside then")
             editor.on('change', function () {
                 const newContent = editor.getValue();
                 vm.$store.commit('updateXMLCode', newContent);
-                //console.log("stored")
-                //localStorage.setItem('xml_code', newContent);
-            });
+            });            
         }).catch((error) => {
             console.error(error);
+        });
+
+        this.$watch('xmlCode', (newVal) => {
+            if(editorPromise) {
+                editorPromise.then((editor) => {
+                    editor.setValue(newVal);
+                }).catch((error) => {
+                    console.error(error);
+                })
+            }
         })
 
-        console.log("test")
-    }
+    },
+
 }
 </script>
 
@@ -132,4 +148,7 @@ textarea {
     text-align: left;
 }
 
+.CodeMirror{
+    z-index: 1;
+}
 </style>

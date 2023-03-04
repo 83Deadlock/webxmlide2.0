@@ -4,31 +4,30 @@
             <div class="xml-selector">
                 <p id="xml-tag">XML</p>
                 <i id="sep" class="fa-solid fa-chevron-right"></i>
-                <input @blur="fileNameOnBlur" v-model="inputValue" ref="input" id="fileName" type="text"
-                    placeholder="Example.xml">
-                <div v-if="hasError" class="error-icon" @mouseover="showErrorMessage">
+                <input @blur="fileNameOnBlur" v-model="inputValue" ref="input" id="fileName" type="text" placeholder="Example.xml">
+                <div v-if="hasError" class="error-icon" @mouseover="showErrorMessage" @mouseleave="hideErrorMessage">
                     <i class="fas fa-times"></i>
-                    <div class="error-message" ref="errorMessage">File name should end with .xml</div>
+                    <div class="error-message" ref="errorMessage">File name should end with ".xml"</div>
                 </div>
                 <div v-else class="success-icon">
                     <i class="fas fa-check"></i>
                 </div>
             </div>
             <div class="upload-download-buttons">
-                <button id="upload_button" type="button" @click="handleUploadButtonClick"><i
-                        class="fas fa-upload"></i></button>
+                <button id="upload_button" type="button" @click="handleUploadButtonClick"><i class="fas fa-upload"></i></button>
                 <button id="download_button" type="button"><i class="fas fa-download"></i></button>
             </div>
             <!--Hidden file input to handle responding to the button click on the upload button-->
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileInputChange" accept=".xml" />
         </div>
         <div class="xml-middle">
-            <XMLEditor />
+            <XMLEditor :xml-code="xmlCode"/>
         </div>
     </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex";
 import XMLEditor from './XMLEditor.vue'
 
 export default {
@@ -36,10 +35,11 @@ export default {
     data() {
         return {
             inputValue: '',
-            errorMessageVisible: false,
+            xmlCode: '',
         };
     },
     computed: {
+        ...mapState(["xml_filename"]),
         hasError() {
             return this.inputValue && !this.inputValue.endsWith('.xml') && this.inputValue.length > 0;
         },
@@ -48,13 +48,18 @@ export default {
         XMLEditor
     },
     methods: {
+        ...mapMutations(["changeXMLFilename"]),
         fileNameOnBlur() {
             const inputElement = this.$refs.input;
+            this.$store.commit("changeXMLFilename", this.inputValue);
             // Set the cursor position to the beginning of the inserted value
             inputElement.setSelectionRange(0, 0);
         },
         showErrorMessage() {
             this.$refs.errorMessage.style.display = 'block';
+        },
+        hideErrorMessage() {
+            this.$refs.errorMessage.style.display = 'none';
         },
         handleUploadButtonClick() {
             // Open the file input dialog
@@ -66,13 +71,18 @@ export default {
             reader.onload = () => {
                 const content = reader.result;
                 // Set the value of the editor to the file content
-                this.$store.commit("updateXMLCode", content);
-                this.$emit('xml-file-upload', content);
+                //this.$store.commit("updateXMLCode", content);
+                this.xmlCode = content;
+                console.log("xmlCode: ", this.xmlCode);
                 // Update the input value to match the file name
                 this.inputValue = file.name;
+                this.$store.commit("changeXMLFilename", this.inputValue);
             };
             reader.readAsText(file);
         },
+    },
+    mounted() {
+        this.inputValue = this.xml_filename;
     }
 }
 </script>
@@ -100,7 +110,9 @@ export default {
 }
 
 .xml-side {
-    width: 50%;
+    width: calc(50% - 60px);
+    padding-right: 30px;
+    padding-left: 30px;
     height: 100%;
     background-color: transparent;
     display: flex;
@@ -113,7 +125,7 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     padding-top: 10px;
-    padding-left: 30px;
+    /*padding-left: 30px;*/
     font-family: "Euclid";
 
 }
@@ -156,15 +168,15 @@ export default {
 
 .xml-middle {
     background-color: transparent;
-    height: 60vh;
-    padding-left: 30px;
+    height: 65vh;
+    /*padding-left: 30px;*/
 }
 
 .xml-bottom {
     display: flex;
     justify-content: space-between;
     padding-top: 0px;
-    padding-left: 30px;
+    /*padding-left: 30px;*/
     font-family: "Euclid";
 }
 
@@ -214,6 +226,8 @@ export default {
     padding: 5px;
     border-radius: 5px;
     box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    font-size: 14px;
 }
 
 .success-icon {
@@ -222,4 +236,5 @@ export default {
 
 .error-icon {
     color: red;
-}</style>
+}
+</style>
