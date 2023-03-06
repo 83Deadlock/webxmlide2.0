@@ -151,4 +151,24 @@ textarea {
 .CodeMirror{
     z-index: 1;
 }
+
+.CodeMirror-scrollbar {
+  height: 8px;
+  width: 8px;
+  background-color: #3c3c3c;
+  border-radius: 4px;
+}
+
+.CodeMirror-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: #3c3c3c;
+}
+
+.CodeMirror-scrollbar-filler {
+  background-color: transparent;
+}
+
+.CodeMirror-gutter-filler {
+  background-color: transparent;
+}
 </style>
