@@ -2,21 +2,24 @@
   <div class="home">
     <XMLSide />
     <div class="black-border"></div>
-    <HelloWorld />
+    <CompanySide />
+    <!--<HelloWorld />-->
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+//import HelloWorld from "@/components/HelloWorld.vue";
 import XMLSide from '@/components/XMLSide.vue';
+import CompanySide from "@/components/CompanySide.vue";
 
 
 export default {
   name: "HomeView",
   components: {
-    HelloWorld,
+    //HelloWorld,
     XMLSide,
+    CompanySide,
   },
 };
 </script>
@@ -24,6 +27,7 @@ export default {
 <style>
 .home{
   display: flex;
+  flex-direction: row;
 }
 
 .black-border {
@@ -31,7 +35,7 @@ export default {
   border-right: 2px solid #111111;
   top: 145px;
   position: absolute;
-  left: 50%;
+  left: calc(50% - 1px);
 
 }
 </style>

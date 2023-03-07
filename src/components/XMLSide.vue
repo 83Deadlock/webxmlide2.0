@@ -17,7 +17,6 @@
                 <button id="upload_button" type="button" @click="handleUploadButtonClick"><i class="fas fa-upload"></i></button>
                 <button id="download_button" type="button" @click="handleDownloadButtonClick" :disabled="hasError"><i class="fas fa-download"></i></button>
             </div>
-            <!--Hidden file input to handle responding to the button click on the upload button-->
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileInputChange" accept=".xml" />
         </div>
         <div class="xml-middle">
@@ -48,7 +47,6 @@
 <script>
 import { mapState, mapMutations } from "vuex";
 import XMLEditor from './XMLEditor.vue';
-// import libxmljs from 'libxmljs';
 
 export default {
     name: 'XMLSide',
@@ -108,7 +106,6 @@ export default {
         fileNameOnBlur() {
             const inputElement = this.$refs.input;
             this.$store.commit("changeXMLFilename", this.inputValue);
-            // Set the cursor position to the beginning of the inserted value
             inputElement.setSelectionRange(0, 0);
         },
         showErrorMessage() {
@@ -118,7 +115,6 @@ export default {
             this.$refs.errorMessage.style.display = 'none';
         },
         handleUploadButtonClick() {
-            // Open the file input dialog
             this.$refs.fileInput.click();
         },
         handleFileInputChange(event) {
@@ -126,11 +122,7 @@ export default {
             const reader = new FileReader();
             reader.onload = () => {
                 const content = reader.result;
-                // Set the value of the editor to the file content
-                //this.$store.commit("updateXMLCode", content);
                 this.xmlCode = content;
-                console.log("xmlCode: ", this.xmlCode);
-                // Update the input value to match the file name
                 this.inputValue = file.name;
                 this.$store.commit("changeXMLFilename", this.inputValue);
             };
@@ -144,10 +136,7 @@ export default {
                 filename = 'Example.xml';
             }
 
-            // Create a new blob from the XML code
             const blob = new Blob([code], { type: 'text/xml' });
-
-            // Create a link element to download the file
             const link = document.createElement('a');
             link.download = filename;
             link.href = window.URL.createObjectURL(blob);
@@ -182,9 +171,6 @@ export default {
             } else {
                 this.syntaxErrors = false;
             }
-
-            console.log("syntaxErrors: ", this.syntaxErrors);
-            console.log("isXMLDecl: ", this.xmlDeclPresent);
 
             return parseErrors.length == 0 && isXmlDeclaration;
         },
@@ -282,7 +268,7 @@ export default {
     overflow: scroll;
     text-align: left;
     font-family: "Euclid";
-    width: 180px;
+    width: 120px;
 }
 
 #fileName:focus {
@@ -368,6 +354,7 @@ export default {
   color: #111111;
   border: 1px solid #111111;
 }
+
 .not-well-formed {
   background-color: #111111;
   color: #0092b2;
