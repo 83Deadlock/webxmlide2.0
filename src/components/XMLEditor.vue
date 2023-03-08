@@ -20,35 +20,9 @@ export default {
             default: '',
         }
     },
-    watch: {
-        /*xmlCode() {
-            this.editorPromise.then((editor) => {
-                editor.setValue(this.xmlCode);
-            })
-            this.alertMe(this.xmlCode);
-        }*/
-    },
-    components: {
-
-    },
-    data() {
-        return {
-            editor: null,
-            content: ''
-        }
-    },
     computed: mapState(["xml_code"]),
     methods: {
         ...mapMutations(["updateXMLCode"]),
-        alertMe(xmlCode){
-            window.alert(xmlCode);
-        },
-        updateContent(code) {
-            this.content = code
-        },
-        fileUploaded(content) {
-            this.editor.setValue(content);
-        },
     },
     mounted() {
         const vm = this;

@@ -71,15 +71,31 @@
             </div>
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileInputChange" :accept="dtdActive ? '.dtd' : (xsdActive ? '.xsd' : '.xslt')" />
         </div>
+        <div class="company-mid-bot">
+            <DTDComp v-if="dtdActive"/>
+            <XSDComp v-if="xsdActive"/>
+            <XSLTComp v-if="xsltActive"/>
+            <XPathComp v-if="xpathActive"/>
+        </div>
         <h1>Hello World!</h1>
     </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
+import DTDComp from "./DTDComp.vue";
+import XSDComp from "./XSDComp.vue";
+import XSLTComp from "./XSLTComp.vue";
+import XPathComp from "./XPathComp.vue";
 
 export default {
     name: "CompanySide",
+    components: {
+        DTDComp,
+        XSDComp,
+        XSLTComp,
+        XPathComp
+    },
     data() {
         return {
             dtdActive: true,
@@ -132,20 +148,24 @@ export default {
             this.$refs.fileInput.click();
         },
         handleDownloadButtonClick(){
-            /* const code = this.xml_code;
-            var filename = this.inputValue;
+            var code = '';
+            var filename = '';
 
-            if(filename == ''){
-                filename = 'Example.xml';
+            if(this.dtdActive){
+                code = this.dtd_code;
+                filename = this.dtd_filename;
+                if(filename == ''){
+                    filename = 'Example.dtd';
+                }
+
+                const blob = new Blob([code], {type: 'text/dtd'});
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = window.URL.createObjectURL(blob);
+                link.click();
+            } else {
+                console.log("NOT IMPLEMENTED YET!");
             }
-
-            const blob = new Blob([code], { type: 'text/xml' });
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = window.URL.createObjectURL(blob);
-            link.click(); */
-
-            console.log("Download clicked!");
         },
         handleFileInputChange(event) {
             /* const file = event.target.files[0];
@@ -162,7 +182,7 @@ export default {
         },
     },
     computed: {
-        ...mapState(["dtd_active","xsd_active","xslt_active","xpath_active","dtd_filename", "xsd_filename", "xslt_filename"]),
+        ...mapState(["dtd_active","xsd_active","xslt_active","xpath_active","dtd_filename", "xsd_filename", "xslt_filename", "dtd_code"]),
         hasError() {
             return (this.hasErrorDTD && this.dtdActive) || (this.hasErrorXSD && this.xsdActive) || (this.hasErrorXSLT && this.xsltActive);
         },
