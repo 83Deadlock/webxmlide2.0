@@ -1,6 +1,6 @@
 <template>
     <div class="dtd-middle">
-        <DTDEditor />
+        <DTDEditor :dtd-code="dtdProp"/>
     </div>
     <div class="dtd-bottom">
         <h3>DTD STATUS</h3>
@@ -14,7 +14,13 @@ import DTDEditor from './DTDEditor.vue';
 
 export default {
     name: "DTDComp",
-    components: { DTDEditor }
+    components: { DTDEditor },
+    props: {
+        dtdProp: {
+            default: '',
+            type: String
+        }
+    }
 }
 </script>
 

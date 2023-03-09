@@ -72,7 +72,7 @@
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileInputChange" :accept="dtdActive ? '.dtd' : (xsdActive ? '.xsd' : '.xslt')" />
         </div>
         <div class="company-mid-bot">
-            <DTDComp v-if="dtdActive"/>
+            <DTDComp v-if="dtdActive" :dtd-prop="dtdCode"/>
             <XSDComp v-if="xsdActive"/>
             <XSLTComp v-if="xsltActive"/>
             <XPathComp v-if="xpathActive"/>
@@ -105,6 +105,7 @@ export default {
             fileNameDTD: '',
             fileNameXSD: '',
             fileNameXSLT: '',
+            dtdCode: '',
         }
     },
     methods: {
@@ -168,17 +169,26 @@ export default {
             }
         },
         handleFileInputChange(event) {
-            /* const file = event.target.files[0];
+            const file = event.target.files[0];
             const reader = new FileReader();
             reader.onload = () => {
                 const content = reader.result;
+                if(this.dtdActive){
+                    this.dtdCode = content;
+                    this.fileNameDTD = file.name;
+                    this.$store.commit("changeDTDFilename", this.fileNameDTD);
+                    console.log("Uploaded file: ", this.fileNameDTD);
+                    console.log("Content: ", this.dtdCode);
+                } else {
+                    console.log("not implemented yet!");
+                }
+                /*
                 this.xmlCode = content;
                 this.inputValue = file.name;
-                this.$store.commit("changeXMLFilename", this.inputValue);
+                this.$store.commit("changeXMLFilename", this.inputValue);*/
             };
-            reader.readAsText(file); */
+            reader.readAsText(file);
 
-            console.log("Upload clicked! ", event);
         },
     },
     computed: {
@@ -204,6 +214,7 @@ export default {
         this.xsdActive = this.xsd_active;
         this.xsltActive = this.xslt_active;
         this.xpathActive = this.xpath_active;
+        this.dtdCode = this.dtd_code;
 
     }
 }

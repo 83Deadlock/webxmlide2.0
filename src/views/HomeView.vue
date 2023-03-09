@@ -3,7 +3,7 @@
     <XMLSide />
     <div class="black-border"></div>
     <CompanySide />
-    <!--<HelloWorld />-->
+    <!--<HelloWorld :teste-prop="test"/>-->
   </div>
 </template>
 
@@ -21,6 +21,11 @@ export default {
     XMLSide,
     CompanySide,
   },
+  /*data(){
+    return {
+      test: 'dadada',
+    }
+  }*/
 };
 </script>
 

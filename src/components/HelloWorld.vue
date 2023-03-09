@@ -14,7 +14,10 @@ import { mapState, mapMutations } from "vuex";
 export default {
   name: "HelloWorld",
   props: {
-
+    /*testeProp : {
+      default: '',
+      type: String
+    }*/
   },
   computed: mapState(["count", "mensagem"]),
   methods: mapMutations(["increment", "changeMessage", "resetMessage"]),

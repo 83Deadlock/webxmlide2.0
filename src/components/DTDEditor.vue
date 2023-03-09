@@ -13,8 +13,8 @@ export default {
     name: 'DTDEditor',
     props: {
         dtdCode: {
-            type: String,
             default: '',
+            type: String
         }
     },
     computed: mapState(["dtd_code"]),
@@ -62,7 +62,7 @@ export default {
                     console.error(error);
                 })
             }
-        })
+        });
     }
 }
 
