@@ -62,7 +62,7 @@ export default {
     computed: {
         ...mapState(["xml_filename","xml_code"]),
         hasError() {
-            return this.inputValue && !this.inputValue.endsWith('.xml') && this.inputValue.length > 0;
+            return (this.inputValue && !this.inputValue.endsWith('.xml') && this.inputValue.length > 0);
         },
         isWellFormed() {
             return this.checkXMLWellFormed(this.xml_code);
@@ -160,7 +160,6 @@ export default {
 
             if(parseErrors.length > 0){
                 for(let i = 0; i < parseErrors.length; i++) {
-                    console.log(i);
                     const error = parseErrors[i];
                     errorMsgs.push(error.textContent.trim());
                 }

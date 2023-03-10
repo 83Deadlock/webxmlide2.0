@@ -182,10 +182,6 @@ export default {
                 } else {
                     console.log("not implemented yet!");
                 }
-                /*
-                this.xmlCode = content;
-                this.inputValue = file.name;
-                this.$store.commit("changeXMLFilename", this.inputValue);*/
             };
             reader.readAsText(file);
 
@@ -197,13 +193,13 @@ export default {
             return (this.hasErrorDTD && this.dtdActive) || (this.hasErrorXSD && this.xsdActive) || (this.hasErrorXSLT && this.xsltActive);
         },
         hasErrorDTD() {
-            return this.fileNameDTD && !this.fileNameDTD.endsWith('.dtd') && this.fileNameDTD.length > 0;
+            return !this.fileNameDTD.endsWith('.dtd') && this.fileNameDTD.length > 0;
         },
         hasErrorXSD() {
-            return this.fileNameXSD && !this.fileNameXSD.endsWith('.xsd') && this.fileNameXSD.length > 0;
+            return !this.fileNameXSD.endsWith('.xsd') && this.fileNameXSD.length > 0;
         },
         hasErrorXSLT() {
-            return this.fileNameXSLT && !this.fileNameXSLT.endsWith('.xslt') && this.fileNameXSLT.length > 0;
+            return !this.fileNameXSLT.endsWith('.xslt') && this.fileNameXSLT.length > 0;
         },
     },
     mounted(){
