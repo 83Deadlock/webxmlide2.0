@@ -7,6 +7,7 @@ const store = createStore({
     mensagem: "default", // Test variable for strings
     xml_code: "", // Stores the XML Editors code
     dtd_code: "", // Stores the DTD Editors code
+    xsd_code: "", // Stores the XSD Editors code
     dtd_active: true,
     xsd_active: false,
     xslt_active: false,
@@ -32,7 +33,9 @@ const store = createStore({
     },
     updateDTDCode(state, code){
       state.dtd_code = code;
-      console.log("DTD CODE IN STORE CHANGED");
+    },
+    updateXSDCode(state, code){
+      state.xsd_code = code;
     },
     changeXMLFilename(state, value){
       state.xml_filename = value;

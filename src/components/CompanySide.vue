@@ -73,7 +73,7 @@
         </div>
         <div class="company-mid-bot">
             <DTDComp v-if="dtdActive" :dtd-prop="dtdCode"/>
-            <XSDComp v-if="xsdActive"/>
+            <XSDComp v-if="xsdActive" :xsd-prop="xsdCode"/>
             <XSLTComp v-if="xsltActive"/>
             <XPathComp v-if="xpathActive"/>
         </div>
@@ -106,6 +106,7 @@ export default {
             fileNameXSD: '',
             fileNameXSLT: '',
             dtdCode: '',
+            xsdCode: '',
         }
     },
     methods: {
@@ -164,6 +165,20 @@ export default {
                 link.download = filename;
                 link.href = window.URL.createObjectURL(blob);
                 link.click();
+
+            } else if(this.xsdActive){
+                code = this.xsd_code;
+                filename = this.xsd_filename;
+                if(filename == ''){
+                    filename = 'Example.xsd';
+                }
+
+                const blob = new Blob([code], {type: 'text/xsd'});
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = window.URL.createObjectURL(blob);
+                link.click();
+
             } else {
                 console.log("NOT IMPLEMENTED YET!");
             }
@@ -177,8 +192,10 @@ export default {
                     this.dtdCode = content;
                     this.fileNameDTD = file.name;
                     this.$store.commit("changeDTDFilename", this.fileNameDTD);
-                    console.log("Uploaded file: ", this.fileNameDTD);
-                    console.log("Content: ", this.dtdCode);
+                } else if(this.xsdActive){
+                    this.xsdCode = content;
+                    this.fileNameXSD = file.name;
+                    this.$store.commit("changeXSDFilename", this.fileNameXSD);
                 } else {
                     console.log("not implemented yet!");
                 }
@@ -188,7 +205,7 @@ export default {
         },
     },
     computed: {
-        ...mapState(["dtd_active","xsd_active","xslt_active","xpath_active","dtd_filename", "xsd_filename", "xslt_filename", "dtd_code"]),
+        ...mapState(["dtd_active","xsd_active","xslt_active","xpath_active","dtd_filename", "xsd_filename", "xslt_filename", "dtd_code", "xsd_code"]),
         hasError() {
             return (this.hasErrorDTD && this.dtdActive) || (this.hasErrorXSD && this.xsdActive) || (this.hasErrorXSLT && this.xsltActive);
         },
@@ -211,7 +228,7 @@ export default {
         this.xsltActive = this.xslt_active;
         this.xpathActive = this.xpath_active;
         this.dtdCode = this.dtd_code;
-
+        this.xsdCode = this.xsd_code;
     }
 }
 </script>
