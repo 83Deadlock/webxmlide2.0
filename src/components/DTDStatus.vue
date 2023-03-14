@@ -16,11 +16,22 @@ export default {
     computed: {
         ...mapState(["dtd_code", "xml_code"]),
         dtdIsWellFormed() {
-            return this.DTDisCorrect(this.dtd_code);
+            return this.DTDisCorrect(this.xml_code, this.dtd_code);
         },
     },
     methods: {
-        DTDisCorrect() {
+        async DTDisCorrect(xmlCode, dtdCode) {
+            const response = await fetch('http://localhost:3000/validateDTD', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    dtd_code: dtdCode,
+                }),
+            });
+            const message = await response.text();
+            console.log(message);
             return true;
         },
     },

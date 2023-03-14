@@ -1,4 +1,7 @@
 <template>
+  <div>
+    <button @click="handleTest">Test Server</button>
+  </div>
   <HeaderComp />
   <router-view />
   <FooterComp />
@@ -13,7 +16,14 @@ export default{
   components: {
     HeaderComp,
     FooterComp
-  }
+  },
+  methods: {
+    async handleTest() {
+      const response = await fetch('http://localhost:3000/test');
+      const message = await response.text();
+      console.log(message);
+    },
+  },
 }
 </script>
 

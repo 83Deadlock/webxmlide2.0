@@ -5,26 +5,20 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "start": "node server/server.js"
   },
   "dependencies": {
-    "ajv": "^8.12.0",
     "codemirror": "^5.65.12",
     "core-js": "^3.8.3",
-    "dtd-file": "^1.0.0",
     "fs": "^0.0.1-security",
-    "libxmljs": "^0.19.10",
     "mitt": "^3.0.0",
     "path": "^0.12.7",
-    "path-browserify": "^1.0.1",
     "stream": "^0.0.2",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuex": "^4.1.0",
-    "vuex-persistedstate": "^4.1.0",
-    "xml-js": "^1.6.11",
-    "xmllint": "github:kripken/xml.js",
-    "xsd-schema-validator": "^0.7.0"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
