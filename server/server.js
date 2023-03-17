@@ -1,10 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const libxmljs = require('libxmljs');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
+const Libxml = require('node-libxml');
 
 const app = express();
 
@@ -25,39 +24,6 @@ app.post('/test', (req, res) => {
   console.log("DTDCode: ", req.body.dtd_code);
   res.send('Hello World!');
 });
-
-app.post('/validateDTD', (req, res) => {
-  const dtdCode = req.body.dtd_code;
-
-  try {
-    // Create a document object and parse the DTD code
-    const xmlDoc = libxmljs.parseXml(`<!DOCTYPE ${dtdCode}>`);
-
-    // Get the DTD object and check for syntax errors
-    const dtd = xmlDoc.getInternalSubset();
-    const syntaxErrors = dtd.validate();
-
-    if (syntaxErrors.length > 0) {
-      // Handle any syntax errors
-      const errorMessages = syntaxErrors.map(error => error.toString());
-      res.status(400).send({ error: errorMessages });
-    } else {
-      // DTD is valid
-      res.send({ message: 'DTD is valid' });
-    }
-  } catch (err) {
-    // Handle any errors
-    console.error(err);
-    res.status(400).send({ error: 'Invalid DTD code' });
-  }
-});
-
-const { DOMParser } = require('xmldom');
-const { tmpdir } = require('os');
-const { writeFileSync } = require('fs');
-const { join } = require('path');
-const { Validator } = require('node-libxml');
-const Libxml = require('node-libxml');
 
 
 app.post('/validate-dtd', async (req, res) => {
@@ -89,7 +55,7 @@ app.post('/validate-dtd', async (req, res) => {
 
     let xmlIsWellFormed = validator.loadXmlFromString(xml);
 
-    if(validator.wellformedErrors){
+    if (validator.wellformedErrors) {
       console.log("[XML LOADING ERROR] ", validator.wellformedErrors);
     } else {
       console.log("[XML LOADING SUCCESSFUL]: ", xmlIsWellFormed);
@@ -97,8 +63,8 @@ app.post('/validate-dtd', async (req, res) => {
 
     validator.loadDtds([dtd_path]);
 
-    if(validator.dtdsLoadedErrors){
-      console.log("[DTD LOADING ERROR] " ,validator.dtdsLoadedErrors);
+    if (validator.dtdsLoadedErrors) {
+      console.log("[DTD LOADING ERROR] ", validator.dtdsLoadedErrors);
       correctFlag = false;
     } else {
       console.log("[DTD LOADING SUCCESS]");
@@ -108,9 +74,12 @@ app.post('/validate-dtd', async (req, res) => {
 
     const isValid = validator.validateAgainstDtds();
 
+    validator.freeXml();
+    validator.freeDtds();
+
     if (isValid) {
       console.log("[XML VALID AGAINST DTD]");
-      res.send({ valid: true, correct: correctFlag});
+      res.send({ valid: true, correct: correctFlag });
     } else {
       console.log(validator.validationDtdErrors);
       res.send({ valid: false, correct: correctFlag });
