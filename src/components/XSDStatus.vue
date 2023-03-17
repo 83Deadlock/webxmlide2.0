@@ -1,7 +1,7 @@
 <template>
     <div class="xsd-status">
-        <p v-if="isLinked">LINKED!</p>
-        <p v-if="isValid">VALID!</p>
+        <!--<p v-if="isLinked">LINKED!</p>
+        <p v-if="isValid">VALID!</p>-->
         <button :class="{ 'well-formed': isWellFormed, 'not-well-formed': !isWellFormed }" :disabled="true">{{ buttonMessage
         }}</button>
         <div class="wellformed_error" v-html="wellFormedErrorMessage"></div>   
@@ -151,7 +151,7 @@ button:disabled {
     text-align: left;
 }
 
-.xsd-status>button {
+.xsd-status > button {
     font-family: "Euclid";
     font-weight: lighter;
     border-radius: 40px;
