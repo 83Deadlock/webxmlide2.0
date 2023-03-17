@@ -38,7 +38,7 @@ export default {
     padding-top: 0px;
     /*padding-left: 30px;*/
     font-family: "Euclid";
-    background-color: aqua;
-    color: black;
+    background-color: transparent;
+    color: #bbbbbb;
 }
 </style>
