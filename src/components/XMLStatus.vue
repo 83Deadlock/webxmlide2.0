@@ -5,13 +5,16 @@
             :disabled="true">{{
                 buttonMessage }}</button>
         <div class="wellformed_error">
-            <div>
+            <div id="xml-decl">
                 <span>{{ xmlDeclMessage }} &nbsp;</span>
                 <i :class="{ 'fas fa-check': xmlDeclPresent, 'fas fa-times': !xmlDeclPresent }"></i><br>
             </div>
-            <div>
+            <div id="xml-wf" @mouseover="showPopup = true" @mouseleave="showPopup = false"><!---->
                 <span>{{ xmlWellFormedMessage }} &nbsp;</span>
                 <i :class="{ 'fas fa-check': xmlWellFormed, 'fas fa-times': !xmlWellFormed }"></i><br>
+                <div class="popup" v-show="showPopup && !xmlWellFormed">
+                    <p v-html="errorString"></p>
+                </div>
             </div>
         </div>
     </div>
@@ -27,7 +30,9 @@ export default {
             xmlDeclPresent: false,
             xmlWellFormed: false,
             xmlWellFormedErrors: [],
-            showHintsBox: false,
+            showPopup: false,
+            errorString: '',
+            testString: 'Teste'
         }
     },
     watch: {
@@ -79,6 +84,15 @@ export default {
             let data = await this.isXMLWellFormed(this.xml_code);
             this.xmlWellFormed = data.wellFormed;
             this.xmlWellFormedErrors = data.errors;
+
+            let str = '';
+
+            this.xmlWellFormedErrors.forEach(function (err) {
+                let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+            })
+
+            this.errorString = str;
         }
     },
     async created() {
@@ -94,6 +108,15 @@ export default {
         let data = await this.isXMLWellFormed(this.xml_code);
         this.xmlWellFormed = data.wellFormed;
         this.xmlWellFormedErrors = data.errors;
+
+        let str = '';
+
+        this.xmlWellFormedErrors.forEach(function (err) {
+            let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+            str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+        })
+
+        this.errorString = str;
     }
 }
 
@@ -131,5 +154,39 @@ button:disabled {
     border-radius: 40px;
     padding: 10px 20px;
     transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+}
+
+.fa-times {
+    color: red;
+}
+
+.fa-check {
+    color: #0092b2;
+}
+
+.popup {
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+    display: block;
+    position: absolute;
+    bottom: calc(20vh);
+    left: calc(50% - 240px);
+    width: 210px;
+    text-align: left;
+    white-space: pre-wrap;
+    padding: 10px;
+    padding-top: 0px;
+    font-size: 12px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+    border-radius: 0px;
+    background-color: #c7c7c7;
+    color: #111111;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    z-index: 5;
+}
+
+.popup > p {
+    padding-left: 5px;
 }
 </style>
