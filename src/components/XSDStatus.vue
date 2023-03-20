@@ -1,7 +1,5 @@
 <template>
     <div class="xsd-status">
-        <!--<p v-if="isLinked">LINKED!</p>
-        <p v-if="isValid">VALID!</p>-->
         <button :class="{ 'well-formed': isWellFormed, 'not-well-formed': !isWellFormed }" :disabled="true">{{ buttonMessage
         }}</button>
         <div class="wellformed_error" v-html="wellFormedErrorMessage"></div>   

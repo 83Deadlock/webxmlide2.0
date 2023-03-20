@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const Libxml = require('node-libxml');
 
+const validator = new Libxml();
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -17,16 +19,44 @@ app.get('/api', (req, res) => {
 
 const port = process.env.PORT || 3000;
 
-app.post('/test', (req, res) => {
-  console.log("\n\n\n\n\n");
-  console.log("XMLCode: ", req.body.xml_code);
-  console.log("\n\n");
-  console.log("DTDCode: ", req.body.dtd_code);
-  res.send('Hello World!');
+app.post('/xml-wellformed', async(req, res) => {
+  let logStr = "\n\n\nPOST ON /xml-wellformed";
+  const xml = req.body.xml_code;
+
+  let xmlWellFormed = validator.loadXmlFromString(xml);
+
+  if (validator.wellformedErrors) {
+    let WellFormedErrors = validator.wellformedErrors;
+    let WellFormedErrorsStr = [];
+
+    WellFormedErrors.forEach(function (obj) {
+      let errorStr = obj.message.trim();
+      errorStr += " at Line " + obj.line + ", Column " + obj.column;
+      WellFormedErrorsStr.push(errorStr);
+    });
+
+    logStr += "\n\t[XML WELL FORMED] -> false";
+    logStr +=  "\n\t\t[ERRORS]";
+    
+    WellFormedErrorsStr.forEach(function(str){
+      logStr += "\n\t\t\t" + str;
+    });
+
+    validator.freeXml();
+    console.log(logStr);
+
+    res.send({ wellFormed: false, errors: WellFormedErrorsStr });    
+  } else {
+    logStr += "\n\t[XML WELL-FORMED] -> " + xmlWellFormed.toString();
+    console.log(logStr);
+    res.send({ wellFormed: true, errors: []});    
+  }
+
+
 });
 
-
 app.post('/validate-dtd', async (req, res) => {
+  let logStr = "\n\n\nPOST ON /validate-dtd";
   const xml = req.body.xml_code;
   const dtd = req.body.dtd_code;
   const dtdFileName = req.body.dtd_filename;
@@ -45,31 +75,28 @@ app.post('/validate-dtd', async (req, res) => {
         if (err) {
           reject(err);
         } else {
-          console.log("[DTD Temp File SAVED!]");
+          logStr += "\n\t[DTD Temp File Saved]";
           resolve();
         }
       });
     });
 
-    const validator = new Libxml();
-
     let xmlIsWellFormed = validator.loadXmlFromString(xml);
 
     if (validator.wellformedErrors) {
-      console.log("[XML LOADING ERROR] ", validator.wellformedErrors);
+      logStr += "\n\t[XML LOADING ERROR] " + validator.wellformedErrors;
     } else {
-      console.log("[XML LOADING SUCCESSFUL]: ", xmlIsWellFormed);
+      logStr += "\n\t[XML LOADING SUCESSFUL] " + xmlIsWellFormed;
     }
 
     validator.loadDtds([dtd_path]);
 
     if (validator.dtdsLoadedErrors) {
-      console.log("[DTD LOADING ERROR] ", validator.dtdsLoadedErrors);
+      logStr += "\n\t[DTD LOADING ERROR] " + validator.dtdsLoadedErrors;
       correctFlag = false;
     } else {
-      console.log("[DTD LOADING SUCCESS]");
+      logStr += "\n\t[DTD LOADING SUCESS]";
       correctFlag = true;
-
     }
 
     const isValid = validator.validateAgainstDtds();
@@ -78,10 +105,12 @@ app.post('/validate-dtd', async (req, res) => {
     validator.freeDtds();
 
     if (isValid) {
-      console.log("[XML VALID AGAINST DTD]");
+      logStr += "\n\t[XML VALID AGAINST DTD]";
+      //console.log(logStr);
       res.send({ valid: true, correct: correctFlag });
     } else {
-      console.log(validator.validationDtdErrors);
+      logStr += "\n\t[XML INVALID AGAINST DTD] -> " + validator.validationDtdErrors;
+      //console.log(logStr);
       res.send({ valid: false, correct: correctFlag });
     }
 
