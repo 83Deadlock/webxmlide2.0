@@ -40,14 +40,13 @@ export default {
     computed: {
         ...mapState(["dtd_code", "xml_code", "dtd_filename"]),
         buttonMessageXML() {
-            return (!this.xmlWellFormed || (this.xmlWellFormed && !this.xmlValidation && this.xmlToDtdLink)) ? "Invalid XML" : (!this.xmlToDtdLink) ? "XML & DTD Unlinked" : "XML Valid"
-            //(this.xmlValidation && this.xmlWellFormed && this.xmlToDtdLink) ? "Valid XML" : (this.xmlWellFormed && !this.xmlValidation && this.xmlToDtdLink) ? "Invalid XML" : "XML & DTD Unlinked";
+            return (!this.xmlWellFormed) ? "XML is Not Well-Formed" : (!this.xmlToDtdLink) ? "XML & DTD Unlinked" : (!this.xmlValidation && this.dtdCorrect) ? "Invalid XML" : "Valid XML" ;
         },
         buttonMessageDTD() {
             return this.dtdCorrect ? "Valid DTD" : "Invalid DTD";
         },
         xmlValid() {
-            return this.xmlValidation;
+            return !(!this.xmlWellFormed || !this.xmlToDtdLink || (!this.xmlValidation && this.dtdCorrect));
         }
     },
     methods: {
