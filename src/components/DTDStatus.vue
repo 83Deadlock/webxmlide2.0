@@ -14,6 +14,10 @@ export default {
         return {
             xmlValidation: false,
             dtdCorrect: false,
+            xmlWellFormed: false,
+            xmlToDtdLink: false,
+            dtd_errors: [],
+            validation_errors: []
         }
     },
     watch: {
@@ -36,7 +40,8 @@ export default {
     computed: {
         ...mapState(["dtd_code", "xml_code", "dtd_filename"]),
         buttonMessageXML() {
-            return this.xmlValidation ? "Valid XML" : "Invalid XML";
+            return (!this.xmlWellFormed || (this.xmlWellFormed && !this.xmlValidation && this.xmlToDtdLink)) ? "Invalid XML" : (!this.xmlToDtdLink) ? "XML & DTD Unlinked" : "XML Valid"
+            //(this.xmlValidation && this.xmlWellFormed && this.xmlToDtdLink) ? "Valid XML" : (this.xmlWellFormed && !this.xmlValidation && this.xmlToDtdLink) ? "Invalid XML" : "XML & DTD Unlinked";
         },
         buttonMessageDTD() {
             return this.dtdCorrect ? "Valid DTD" : "Invalid DTD";
@@ -63,14 +68,22 @@ export default {
         },
         async validateXML() {
             let data = await this.isXMLValid(this.xml_code, this.dtd_code, this.dtd_filename);
-            this.xmlValidation = data.valid;
-            this.dtdCorrect = data.correct;
+            this.xmlValidation = data.xml_valid_on_dtd;
+            this.dtdCorrect = data.dtd_correct;
+            this.xmlToDtdLink = data.xml_to_dtd_link;
+            this.xmlWellFormed = data.xml_wellformed;
+            this.dtd_errors = data.dtd_errors;
+            this.validation_errors = data.validation_errors;
         }
     },
     async created() {
         let data = await this.isXMLValid(this.xml_code, this.dtd_code, this.dtd_filename);
-        this.xmlValidation = data.valid;
-        this.dtdCorrect = data.correct;
+        this.xmlValidation = data.xml_valid_on_dtd;
+        this.dtdCorrect = data.dtd_correct;
+        this.xmlToDtdLink = data.xml_to_dtd_link;
+        this.xmlWellFormed = data.xml_wellformed;
+        this.dtd_errors = data.dtd_errors;
+        this.validation_errors = data.validation_errors;
     }
 }
 </script>
