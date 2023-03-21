@@ -17,7 +17,6 @@ const store = createStore({
     xsd_filename: "", // Stores the XSD Filename
     xslt_filename: "", // Stores the XSLT Filename
   },
-  getters: {},
   mutations: {
     increment(state) {
       state.count++;
