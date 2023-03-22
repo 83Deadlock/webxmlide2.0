@@ -36,19 +36,14 @@ app.post('/xml-wellformed', async (req, res) => {
       WellFormedErrorsStr.push(errorStr);
     });
 
-    logStr += "\n\t[XML WELL FORMED] -> false";
-    logStr += "\n\t\t[ERRORS]";
-
-    WellFormedErrorsStr.forEach(function (str) {
-      logStr += "\n\t\t\t" + str;
-    });
+    logStr += "\n\t[XML IS NOT WELL FORMED]";
 
     validator.freeXml();
     console.log(logStr);
 
     res.send({ wellFormed: false, errors: WellFormedErrorsStr });
   } else {
-    logStr += "\n\t[XML WELL-FORMED] -> " + xmlWellFormed.toString();
+    logStr += "\n\t[XML WELL-FORMED]";
     console.log(logStr);
     res.send({ wellFormed: true, errors: [] });
   }
@@ -60,7 +55,11 @@ app.post('/validate-dtd', async (req, res) => {
   let logStr = "\n\n\nPOST ON /validate-dtd";
   const xml = req.body.xml_code;
   const dtd = req.body.dtd_code;
-  const dtdFileName = req.body.dtd_filename;
+  let dtdFileName = req.body.dtd_filename;
+
+  if(dtdFileName == ''){
+    dtdFileName = "Example.dtd";
+  }
 
   try {
 
@@ -90,11 +89,13 @@ app.post('/validate-dtd', async (req, res) => {
     let xmlWellFormedFlag = false;
 
     if (validator.wellformedErrors) {
-      logStr += "\n\t[XML LOADING ERROR] " + validator.wellformedErrors;
+      logStr += "\n\t[XML LOADING ERROR]";
     } else {
-      logStr += "\n\t[XML LOADING SUCESSFUL] " + xmlIsWellFormed;
+      logStr += "\n\t[XML LOADING SUCESSFUL]";
       xmlWellFormedFlag = true;
     }
+
+    //END
 
     // Analyzing DTD
 
@@ -106,7 +107,7 @@ app.post('/validate-dtd', async (req, res) => {
 
 
     if (validator.dtdsLoadedErrors) {
-      logStr += "\n\t[DTD LOADING ERROR] " + validator.dtdsLoadedErrors;
+      logStr += "\n\t[DTD PARSING ERROR]";
 
       let dtdErrors = validator.dtdsLoadedErrors;
 
@@ -119,10 +120,12 @@ app.post('/validate-dtd', async (req, res) => {
       });
 
     } else {
-      logStr += "\n\t[DTD LOADING SUCESS]";
+      logStr += "\n\t[DTD PARSING SUCESS]";
 
       dtdCorrectFlag = true;
     }
+
+    //End
 
     // Checking if XML and DTD are linked
 
@@ -169,8 +172,13 @@ app.post('/validate-dtd', async (req, res) => {
       const dtdLinkLine = xmlLines[1];
       if (dtdLinkLine == strExp) {
         xmlToDdtLinkFlag = true;
+        logStr += "\n\t[XML AND DTD ARE LINKED]";
+      } else {
+        logStr += "\n\t[XML AND DTD ARE NOT LINKED]";
       }
     }
+
+    //END
 
     // Validating XML against DTD
 
@@ -180,7 +188,7 @@ app.post('/validate-dtd', async (req, res) => {
     if (isValid) {
       logStr += "\n\t[XML VALID AGAINST DTD]";
     } else if (dtdCorrectFlag) {
-      logStr += "\n\t[XML INVALID AGAINST DTD] -> " + validator.validationDtdErrors;
+      logStr += "\n\t[XML INVALID AGAINST DTD]";
       let validationErrorsTmp = validator.validationDtdErrors[dtd_path];
 
       validationErrorsTmp.forEach(function (obj) {
@@ -203,7 +211,8 @@ app.post('/validate-dtd', async (req, res) => {
       validation_errors: validationErrorsStr
     };
 
-    console.log("RESPONDING: ", responseObject);
+    console.log(logStr);
+    console.log("\n\t[SERVER RESPONSE] ", responseObject);
     res.send(responseObject);
 
     fs.unlinkSync(dtd_path);

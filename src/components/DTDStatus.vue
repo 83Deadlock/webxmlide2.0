@@ -1,7 +1,19 @@
 <template>
     <div class="dtd-status">
-        <button :class="{ 'valid': dtdCorrect, 'invalid': !dtdCorrect }" :disabled="true">{{ buttonMessageDTD }}</button>
-        <button :class="{ 'valid': xmlValid, 'invalid': !xmlValid }" :disabled="true">{{ buttonMessageXML }}</button>
+        <div @mouseenter="showDTDPopup = true" @mouseleave="showDTDPopup = false">
+            <button :class="{ 'valid': dtdCorrect, 'invalid': !dtdCorrect }" :disabled="true">{{ buttonMessageDTD
+            }}</button>
+        </div>
+        <div @mouseenter="showXMLPopup = true" @mouseleave="showXMLPopup = false">
+            <button :class="{ 'valid': xmlValid, 'invalid': !xmlValid }" :disabled="true">{{ buttonMessageXML }}</button>
+        </div>
+
+        <div class="popupDTD" v-show="showDTDPopup && !dtdCorrect">
+            <p v-html="errorDTDString"></p>
+        </div>
+        <div class="popupXML" v-show="showXMLPopup && !xmlValid">
+            <p v-html="errorXMLString"></p>
+        </div>
     </div>
 </template>
 
@@ -12,12 +24,18 @@ export default {
     name: "DTDStatus",
     data() {
         return {
+            // Status-related data
             xmlValidation: false,
             dtdCorrect: false,
             xmlWellFormed: false,
             xmlToDtdLink: false,
             dtd_errors: [],
-            validation_errors: []
+            validation_errors: [],
+            // Display-related data
+            showXMLPopup: false,
+            errorXMLString: '',
+            showDTDPopup: false,
+            errorDTDString: '',
         }
     },
     watch: {
@@ -40,7 +58,7 @@ export default {
     computed: {
         ...mapState(["dtd_code", "xml_code", "dtd_filename"]),
         buttonMessageXML() {
-            return (!this.xmlWellFormed) ? "XML is Not Well-Formed" : (!this.xmlToDtdLink) ? "XML & DTD Unlinked" : (!this.xmlValidation && this.dtdCorrect) ? "Invalid XML" : "Valid XML" ;
+            return (!this.xmlWellFormed) ? "XML is Not Well-Formed" : (!this.xmlToDtdLink) ? "XML & DTD Unlinked" : (!this.xmlValidation && this.dtdCorrect) ? "Invalid XML" : "Valid XML";
         },
         buttonMessageDTD() {
             return this.dtdCorrect ? "Valid DTD" : "Invalid DTD";
@@ -73,6 +91,28 @@ export default {
             this.xmlWellFormed = data.xml_wellformed;
             this.dtd_errors = data.dtd_errors;
             this.validation_errors = data.validation_errors;
+
+            let str = '';
+
+            this.dtd_errors.forEach(function (err) {
+                let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+            })
+
+            this.errorDTDString = str;
+
+            str = '';
+
+            this.validation_errors.forEach(function (err) {
+                let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+            })
+
+            if (!this.xmlToDtdLink) {
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp; XML Document and DTD are not linked<br>';
+            }
+
+            this.errorXMLString = str;
         }
     },
     async created() {
@@ -83,6 +123,28 @@ export default {
         this.xmlWellFormed = data.xml_wellformed;
         this.dtd_errors = data.dtd_errors;
         this.validation_errors = data.validation_errors;
+
+        let str = '';
+
+        this.dtd_errors.forEach(function (err) {
+            let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+            str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+        })
+
+        this.errorDTDString = str;
+
+        str = '';
+
+        this.validation_errors.forEach(function (err) {
+            let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+            str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+        })
+
+        if (!this.xmlToDtdLink) {
+            str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp; XML Document and DTD are not linked<br>';
+        }
+
+        this.errorXMLString = str;
     }
 }
 </script>
@@ -119,5 +181,33 @@ button {
     flex-direction: row-reverse;
     gap: 5px;
     text-align: right;
+}
+
+.popupDTD,
+.popupXML {
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+    display: block;
+    position: absolute;
+    bottom: calc(20vh);
+    right: calc(50% - 240px);
+    width: 210px;
+    text-align: left;
+    white-space: pre-wrap;
+    padding: 10px;
+    padding-top: 0px;
+    font-size: 12px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+    border-radius: 0px;
+    background-color: #c7c7c7;
+    color: #111111;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    z-index: 5;
+}
+
+.popupDTD > p,
+.popupXML > p {
+    padding-left: 5px;
 }
 </style>

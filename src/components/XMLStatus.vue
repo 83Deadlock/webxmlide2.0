@@ -4,12 +4,12 @@
             :class="{ 'well-formed': (xmlWellFormed && xmlDeclPresent), 'not-well-formed': !(xmlWellFormed && xmlDeclPresent) }"
             :disabled="true">{{
                 buttonMessage }}</button>
-        <div class="wellformed_error">
+        <div :class="{'xml-status-indicator' : !xmlWellFormed}" style="cursor: default; padding-right: 2px;" @mouseenter="showPopup = true" @mouseleave="showPopup = false">
             <div id="xml-decl">
                 <span>{{ xmlDeclMessage }} &nbsp;</span>
                 <i :class="{ 'fas fa-check': xmlDeclPresent, 'fas fa-times': !xmlDeclPresent }"></i><br>
             </div>
-            <div id="xml-wf" @mouseover="showPopup = true" @mouseleave="showPopup = false"><!---->
+            <div id="xml-wf"><!---->
                 <span>{{ xmlWellFormedMessage }} &nbsp;</span>
                 <i :class="{ 'fas fa-check': xmlWellFormed, 'fas fa-times': !xmlWellFormed }"></i><br>
                 <div class="popup" v-show="showPopup && !xmlWellFormed">
@@ -27,12 +27,13 @@ export default {
     name: 'XMLStatus',
     data() {
         return {
+            // Status-related data
             xmlDeclPresent: false,
             xmlWellFormed: false,
             xmlWellFormedErrors: [],
+            // Display-related data
             showPopup: false,
             errorString: '',
-            testString: 'Teste'
         }
     },
     watch: {
@@ -189,4 +190,13 @@ button:disabled {
 .popup > p {
     padding-left: 5px;
 }
+
+.xml-status-indicator{
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+}
+
+.xml-status-indicator:hover{
+    color: #7c7c7c;
+}
+
 </style>

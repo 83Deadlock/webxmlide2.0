@@ -27,16 +27,13 @@ export default {
 
 <style scoped>
 .dtd-middle {
-    background-color: green;
     height: 65vh;
-    /*padding-left: 30px;*/
 }
 
 .dtd-bottom {
     display: flex;
     justify-content: space-between;
     padding-top: 0px;
-    /*padding-left: 30px;*/
     font-family: "Euclid";
     background-color: transparent;
     color: #bbbbbb;
