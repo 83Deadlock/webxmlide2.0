@@ -48,7 +48,6 @@ app.post('/xml-wellformed', async (req, res) => {
     res.send({ wellFormed: true, errors: [] });
   }
 
-
 });
 
 app.post('/validate-dtd', async (req, res) => {
@@ -57,7 +56,7 @@ app.post('/validate-dtd', async (req, res) => {
   const dtd = req.body.dtd_code;
   let dtdFileName = req.body.dtd_filename;
 
-  if(dtdFileName == ''){
+  if (dtdFileName == '') {
     dtdFileName = "Example.dtd";
   }
 
@@ -219,6 +218,59 @@ app.post('/validate-dtd', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.send({ valid: false, correct: false });
+  }
+});
+
+app.post('/dtd-to-xsd', async (req, res) => {
+  let logStr = "\n\n\nPOST ON /dtd-to-xsd";
+  const dtd = req.body.dtd_code;
+  let dtdFileName = req.body.dtd_filename;
+
+
+  if (dtdFileName == '') {
+    dtdFileName = "Example.dtd";
+  }
+  let xsdFileName = dtdFileName.replace(".dtd",".xsd");
+
+  try {
+
+    // Creating DTD Temp file
+
+    const dtd_path = path.join(__dirname, 'temp', dtdFileName);
+    const xsd_path = path.join(__dirname, 'temp', xsdFileName);
+
+    if (!fs.existsSync(path.join(__dirname, 'temp'))) {
+      fs.mkdirSync(path.join(__dirname, 'temp'));
+    }
+
+    await new Promise((resolve, reject) => {
+      fs.writeFile(dtd_path, dtd, function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          logStr += "\n\t[DTD Temp File Saved]";
+          resolve();
+        }
+      });
+    });
+
+    const { exec } = require('child_process');
+
+    exec(`java -jar trang.jar ${dtdFilePath} ${xsdFilePath}`, (err, stdout, stderr) => {
+      if (err) {
+        console.error(`Trang execution failed: ${err}`);
+        return;
+      }
+      console.log("SUCCESS!")
+      console.log(`Trang output: ${stdout}`);
+    });
+    
+    res.send({valid: true});
+
+    fs.unlinkSync(dtd_path);
+  } catch (error) {
+    console.error(error);
+    res.send({ valid: false });
   }
 });
 
