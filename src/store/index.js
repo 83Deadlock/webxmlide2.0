@@ -34,6 +34,7 @@ const store = createStore({
       state.dtd_code = code;
     },
     updateXSDCode(state, code){
+      console.log("XSDCodeUpdated");
       state.xsd_code = code;
     },
     changeXMLFilename(state, value){
@@ -43,6 +44,7 @@ const store = createStore({
       state.dtd_filename = value;
     },
     changeXSDFilename(state,value){
+      console.log("XSDFilaNameChanged");
       state.xsd_filename = value;
     },
     changeXSLTFilename(state,value){
@@ -53,6 +55,7 @@ const store = createStore({
       state.xsd_active = state.xslt_active = state.xpath_active = false;
     },
     activateXSD(state){
+      console.log("xsd activated");
       state.xsd_active = true;
       state.dtd_active = state.xslt_active = state.xpath_active = false;
     },

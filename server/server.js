@@ -210,7 +210,6 @@ app.post('/validate-dtd', async (req, res) => {
     console.log('-#-#-#-#-#-#-#-#-#');
     res.send(responseObject);
 
-    fs.unlinkSync(dtd_path);
   } catch (error) {
     console.error(error);
     res.send({ valid: false, correct: false });
@@ -226,7 +225,7 @@ app.post('/dtd-to-xsd', async (req, res) => {
     dtdFileName = "Example.dtd";
   }
 
-  let xsdFileName = dtdFileName.replace(".dtd",".xsd");
+  let xsdFileName = dtdFileName.replace(".dtd", ".xsd");
 
   try {
 
@@ -234,6 +233,8 @@ app.post('/dtd-to-xsd', async (req, res) => {
 
     const dtd_path = path.join(__dirname, 'temp', dtdFileName);
     const xsd_path = path.join(__dirname, 'temp', xsdFileName);
+
+    const jar_path = path.join(__dirname, 'trang.jar');
 
     if (!fs.existsSync(path.join(__dirname, 'temp'))) {
       fs.mkdirSync(path.join(__dirname, 'temp'));
@@ -252,21 +253,20 @@ app.post('/dtd-to-xsd', async (req, res) => {
 
     const { exec } = require('child_process');
 
-    exec(`java -jar trang.jar ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
+    exec(`java -jar ${jar_path} ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
       if (err) {
         console.error(`Trang execution failed: ${err}`);
         return;
       }
-      console.log("SUCCESS!")
-      console.log(`Trang output: ${stdout}`);
+      console.log("SUCCESS!");
     });
-    
-    res.send({test: true});
 
-    fs.unlinkSync(dtd_path);
+    let result = fs.readFileSync(xsd_path).toString();
+    res.send({ xsd_code: result, xsd_filename: xsdFileName });
+
   } catch (error) {
     console.error(error);
-    res.send({ test: false });
+    res.send({ xsd_code: '', xsd_filename: '' });
   }
 });
 

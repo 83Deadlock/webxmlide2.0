@@ -23,8 +23,10 @@ export default {
                 }),
             });
             const data = await response.json();
-            //return data;
-            console.log(data);
+            this.$store.commit('updateXSDCode', data.xsd_code);
+            this.$store.commit('changeXSDFilename', data.xsd_filename);
+            this.$store.commit('activateXSD');
+
             console.log("THIS WILL CONVERT SOMETHING");
         }
     }

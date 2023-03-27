@@ -228,6 +228,36 @@ export default {
         this.xpathActive = this.xpath_active;
         this.dtdCode = this.dtd_code;
         this.xsdCode = this.xsd_code;
+    },
+    watch: {
+        dtd_active: {
+            handler: function(){
+                if(this.dtd_active){
+                    this.dtd_activate();
+                }
+            }
+        },
+        xsd_active: {
+            handler: function(){
+                if(this.xsd_active){
+                    this.xsd_activate();
+                }
+            }
+        },
+        xslt_active: {
+            handler: function(){
+                if(this.xslt_active){
+                    this.xslt_activate();
+                }
+            }
+        },
+        xpath_active: {
+            handler: function(){
+                if(this.xpath_active){
+                    this.xpath_activate();
+                }
+            }
+        }
     }
 }
 </script>
