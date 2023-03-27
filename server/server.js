@@ -45,6 +45,7 @@ app.post('/xml-wellformed', async (req, res) => {
   } else {
     logStr += "\n\t[XML WELL-FORMED]";
     console.log(logStr);
+    console.log('-#-#-#-#-#-#-#-#-#');
     res.send({ wellFormed: true, errors: [] });
   }
 
@@ -99,17 +100,11 @@ app.post('/validate-dtd', async (req, res) => {
     // Analyzing DTD
 
     validator.loadDtds([dtd_path]);
-
     let dtdCorrectFlag = false;
-
     let dtdErrorsStrArr = [];
-
-
     if (validator.dtdsLoadedErrors) {
       logStr += "\n\t[DTD PARSING ERROR]";
-
       let dtdErrors = validator.dtdsLoadedErrors;
-
       dtdErrors.forEach(function (obj) {
         if (typeof (obj) != "string") {
           let errorStr = obj.message.trim();
@@ -117,10 +112,8 @@ app.post('/validate-dtd', async (req, res) => {
           dtdErrorsStrArr.push(errorStr);
         }
       });
-
     } else {
       logStr += "\n\t[DTD PARSING SUCESS]";
-
       dtdCorrectFlag = true;
     }
 
@@ -130,18 +123,14 @@ app.post('/validate-dtd', async (req, res) => {
 
     let dtdCodeLines = dtd.split('\n');
     let dtdLines = dtdCodeLines.filter((line) => line.startsWith("<!ELEMENT"));
-
     const elementRegex = /<!ELEMENT\s(\w+)\s/;
-
     const elemsMap = new Map();
     let elems = [];
-
     dtdLines.forEach(function (line) {
       let match = line.match(elementRegex);
       elems.push(match[1]);
       elemsMap.set(match[1], 0);
     });
-
     let xmlElements = dtdLines.join();
 
     elems.forEach(function (elem) {
@@ -181,10 +170,12 @@ app.post('/validate-dtd', async (req, res) => {
 
     // Validating XML against DTD
 
-    const isValid = validator.validateAgainstDtds();
+    let isValid = validator.validateAgainstDtds();
     let validationErrorsStr = [];
 
     if (isValid) {
+      isValid = true;
+      console.log("TESTE DE TRUE", isValid)
       logStr += "\n\t[XML VALID AGAINST DTD]";
     } else if (dtdCorrectFlag) {
       logStr += "\n\t[XML INVALID AGAINST DTD]";
@@ -197,7 +188,11 @@ app.post('/validate-dtd', async (req, res) => {
           validationErrorsStr.push(errorStr);
         }
       });
+    } else {
+      isValid = false;
+      logStr += "\n\t[XML INVALIDATION FAILED AGAINST INCORRECT DTD]";
     }
+
     validator.freeXml();
     validator.freeDtds();
 
@@ -212,6 +207,7 @@ app.post('/validate-dtd', async (req, res) => {
 
     console.log(logStr);
     console.log("\n\t[SERVER RESPONSE] ", responseObject);
+    console.log('-#-#-#-#-#-#-#-#-#');
     res.send(responseObject);
 
     fs.unlinkSync(dtd_path);
@@ -226,15 +222,15 @@ app.post('/dtd-to-xsd', async (req, res) => {
   const dtd = req.body.dtd_code;
   let dtdFileName = req.body.dtd_filename;
 
-
   if (dtdFileName == '') {
     dtdFileName = "Example.dtd";
   }
+
   let xsdFileName = dtdFileName.replace(".dtd",".xsd");
 
   try {
 
-    // Creating DTD Temp file
+    // Creating DTD Temp file and XSD Path
 
     const dtd_path = path.join(__dirname, 'temp', dtdFileName);
     const xsd_path = path.join(__dirname, 'temp', xsdFileName);
@@ -256,7 +252,7 @@ app.post('/dtd-to-xsd', async (req, res) => {
 
     const { exec } = require('child_process');
 
-    exec(`java -jar trang.jar ${dtdFilePath} ${xsdFilePath}`, (err, stdout, stderr) => {
+    exec(`java -jar trang.jar ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
       if (err) {
         console.error(`Trang execution failed: ${err}`);
         return;
@@ -265,12 +261,12 @@ app.post('/dtd-to-xsd', async (req, res) => {
       console.log(`Trang output: ${stdout}`);
     });
     
-    res.send({valid: true});
+    res.send({test: true});
 
     fs.unlinkSync(dtd_path);
   } catch (error) {
     console.error(error);
-    res.send({ valid: false });
+    res.send({ test: false });
   }
 });
 

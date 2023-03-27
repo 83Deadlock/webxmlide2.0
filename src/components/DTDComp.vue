@@ -4,7 +4,7 @@
     </div>
     <div class="dtd-bottom">
         <DTDStatus />
-        <h3>DTD ACTIONS</h3>
+        <DTDActions />
     </div>
 </template>
 
@@ -12,10 +12,11 @@
 //import {mapState, mapMutations} from "vuex";
 import DTDEditor from './DTDEditor.vue';
 import DTDStatus from './DTDStatus.vue';
+import DTDActions from './DTDActions.vue';
 
 export default {
     name: "DTDComp",
-    components: { DTDEditor, DTDStatus },
+    components: { DTDEditor, DTDStatus, DTDActions },
     props: {
         dtdProp: {
             default: '',
