@@ -26,15 +26,13 @@ button {
     font-family: "Euclid", Helvetica, Arial;
     padding: 10px;
     border-radius: 20px;
+    background-color: #272727;
     border: #0092b2 2px solid;
-    transition: all 0.1s cubic-bezier(.25,.50,.75,1);
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
 }
 
 button:hover {
-    color: #272727;
-    background: #0092b2 !important;
-    border: #272727 2px solid;
+    background-color: black !important;
     cursor: pointer;
-
 }
 </style>
