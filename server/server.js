@@ -270,6 +270,39 @@ app.post('/dtd-to-xsd', async (req, res) => {
   }
 });
 
+var libxmljs2 = require('libxmljs2');
+
+app.post('/run-xpath', async (req,res) => {
+  let logStr = "\n\n\nPOST ON /run-xpath";
+  const xml = req.body.xml_code;
+  let xmlWellFormed = validator.loadXmlFromString(xml);
+  let outputStr = "";
+
+  if(validator.WellFormedErrors) {
+    logStr += "\n\t[XML NOT WELL-FORMED]";
+    outputStr = "XML is not well-formed.\nXPath can't run expressions on non-well-formed documents."
+  } else {
+    var xmlDoc = libxmljs2.parseXml(xml);
+  
+    const xpath_exp = req.body.xpath;
+    var result = xmlDoc.find(xpath_exp);
+    if(result == null){
+      outputStr = "Invalid XPath Expression.";
+    } else if(result == ''){
+      outputStr = "No results found.";
+    } else {
+      result.forEach(elem => outputStr += elem.text() + "\n");
+      outputStr = outputStr.trim().replace(/\n+$/, '');
+    }
+
+    console.log(typeof(outputStr));
+    logStr += "\n\t[RESULT]\n\t\t-> " + outputStr;
+  }
+
+  validator.freeXml();
+  console.log(logStr);
+  res.send({ output: outputStr})
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

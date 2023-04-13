@@ -13,6 +13,7 @@
     "codemirror": "^5.65.12",
     "core-js": "^3.8.3",
     "fs": "^0.0.1-security",
+    "libxmljs2": "^0.31.0",
     "mitt": "^3.0.0",
     "path": "^0.12.7",
     "stream": "^0.0.2",

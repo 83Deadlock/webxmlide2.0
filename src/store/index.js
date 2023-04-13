@@ -8,6 +8,8 @@ const store = createStore({
     xml_code: "", // Stores the XML Editors code
     dtd_code: "", // Stores the DTD Editors code
     xsd_code: "", // Stores the XSD Editors code
+    xpath_code: "", //Stores the XPath Input Expression
+    xpath_output: "", //store the xpath output
     dtd_active: true,
     xsd_active: false,
     xslt_active: false,
@@ -34,8 +36,13 @@ const store = createStore({
       state.dtd_code = code;
     },
     updateXSDCode(state, code){
-      console.log("XSDCodeUpdated");
       state.xsd_code = code;
+    },
+    changeXPathCode(state,code){
+      state.xpath_code = code;
+    },
+    changeXPathOutput(state,code){
+      state.xpath_output = code;
     },
     changeXMLFilename(state, value){
       state.xml_filename = value;
@@ -44,7 +51,6 @@ const store = createStore({
       state.dtd_filename = value;
     },
     changeXSDFilename(state,value){
-      console.log("XSDFilaNameChanged");
       state.xsd_filename = value;
     },
     changeXSLTFilename(state,value){
