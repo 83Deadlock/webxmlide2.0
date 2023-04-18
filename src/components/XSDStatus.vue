@@ -1,8 +1,19 @@
 <template>
     <div class="xsd-status">
-        <button :class="{ 'well-formed': isWellFormed, 'not-well-formed': !isWellFormed }" :disabled="true">{{ buttonMessage
-        }}</button>
-        <div class="wellformed_error" v-html="wellFormedErrorMessage"></div>   
+        <div @mouseenter="showXSDPopup = true" @mouseleave="showXSDPopup = false">
+            <button :class="{ 'valid': xsdCorrect, 'invalid': !xsdCorrect }" :disabled="true">{{ buttonMessageXSD
+            }}</button>
+        </div>
+        <div @mouseenter="showXMLPopup = true" @mouseleave="showXMLPopup = false">
+            <button :class="{ 'valid': xmlValid, 'invalid': !xmlValid }" :disabled="true">{{ buttonMessageXML }}</button>
+        </div>
+
+        <div class="popupXSD" v-show="showXSDPopup && !xsdCorrect">
+            <p v-html="errorXSDString"></p>
+        </div>
+        <div class="popupXML" v-show="showXMLPopup && !xmlValid">
+            <p v-html="errorXMLString"></p>
+        </div>
     </div>
 </template>
 
@@ -13,124 +24,146 @@ export default {
     name: 'XSDStatus',
     data() {
         return {
-            syntaxErrors: false,
-            xmlDeclPresent: false,
+            // Status-related data
+            xmlValidation: false,
+            xsdCorrect: false,
+            xmlWellFormed: false,
+            xmlToXsdLink: false,
+            xsd_errors: [],
+            validation_errors: [],
+            // Display-related data
+            showXMLPopup: false,
+            errorXMLString: '',
+            showXSDPopup: false,
+            errorXSDString: '',
+        }
+    },
+    watch: {
+        xml_code: {
+            handler: function () {
+                this.validateXML();
+            }
+        },
+        xsd_code: {
+            handler: function () {
+                this.validateXML();
+            }
+        },
+        xsd_filename: {
+            handler: function () {
+                this.validateXML();
+            }
         }
     },
     computed: {
-        ...mapState(["xsd_filename", "xsd_code", "xml_code"]),
-        isWellFormed() {
-            return this.checkXSDWellFormed(this.xsd_code);
+        ...mapState(["xsd_code", "xml_code", "xsd_filename"]),
+        buttonMessageXML() {
+            return (!this.xmlWellFormed) ? "XML is Not Well-Formed" : (!this.xmlToXsdLink) ? "XML & XSD Unlinked" : (!this.xmlValidation && this.xsdCorrect) ? "Invalid XML" : "Valid XML";
         },
-        isValid() {
-            return this.isValidXSD();
+        buttonMessageXSD() {
+            return this.xsdCorrect ? "Valid XSD" : "Invalid XSD";
         },
-        buttonMessage() {
-            return this.isWellFormed ? "Well-Formed XSD" : "XSD is not Well-Formed";
-        },
-        isLinked() {
-            return this.isLinkedXSD();
-        },
-        wellFormedErrorMessage() {
-            var str = ''
-            if (!this.xmlDeclPresent) {
-                str += '<span>Missing XML Declaration &nbsp;</span>'
-                str += '<i style="color: red;" class="fas fa-times"></i><br>'
-            } else {
-                str += '<span>XML Declaration &nbsp;</span>'
-                str += '<i style="color: #0092b2; padding-top: 1px;" class="fas fa-check"></i><br>'
-            }
-            if (this.syntaxErrors) {
-                str += '<span>Syntax Errors Found &nbsp;</span>'
-                str += '<i style="color: red;" class="fas fa-times"></i>'
-            } else {
-                str += '<span>No Syntax Errors &nbsp;</span>'
-                str += '<i style="color: #0092b2; padding-top: 1px;" class="fas fa-check"></i><br>'
-            }
-            return str
+        xmlValid() {
+            return !(!this.xmlWellFormed || !this.xmlToXsdLink || (!this.xmlValidation && this.xsdCorrect));
         }
     },
     methods: {
-        isValidXSD() {
-            return true;
+        async isXMLValid(xmlCode, xsdCode, xsdFilename) {
+            const response = await fetch('http://localhost:3000/validate-xsd', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    xml_code: xmlCode,
+                    xsd_code: xsdCode,
+                    xsd_filename: xsdFilename,
+                }),
+            });
+            const data = await response.json();
+            return data;
         },
-        isLinkedXSD() {
-            const parser = new DOMParser();
-            const serializer = new XMLSerializer();
+        async validateXML() {
+            let data = await this.isXMLValid(this.xml_code, this.xsd_code, this.xsd_filename);
+            this.xmlValidation = data.xml_valid_on_xsd;
+            this.xsdCorrect = data.xsd_correct;
+            this.xmlToXsdLink = data.xml_to_xsd_link;
+            this.xmlWellFormed = data.xml_wellformed;
+            this.xsd_errors = data.xsd_errors;
+            this.validation_errors = data.validation_errors;
 
-            // Parse the xml_code and xsd_code strings into Document objects
-            const xmlDoc = parser.parseFromString(this.xml_code, "text/xml");
-            const xsdDoc = parser.parseFromString(this.xsd_code, "text/xml");
+            let str = '';
 
-            // Get the root element of the xml_code document
-            const rootElement = xmlDoc.documentElement;
+            if (this.xsd_errors != null) {
+                this.xsd_errors.forEach(function (err) {
+                    let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+                    str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+                })
 
-            // Check if the schemaLocation attribute is set on the root element
-            if (rootElement.hasAttribute("xsi:schemaLocation")) {
-                // Get the value of the schemaLocation attribute
-                const schemaLocation = rootElement.getAttribute("xsi:schemaLocation");
+                this.errorXSDString = str;
 
-                // Split the schemaLocation value into an array of URIs
-                const schemaLocationUris = schemaLocation.split(/\s+/);
-
-                // Check if the xsd_filename is in the schemaLocation URI list
-                const usingXsdCode = schemaLocationUris.includes(this.xsd_filename);
-
-                // Return whether or not the xml_code is using the xsd_code as schema definition
-                return usingXsdCode;
-            } else {
-                // If the schemaLocation attribute is not set, serialize the xml_code and xsd_code
-                // documents as strings and compare them directly
-                const xmlCodeString = serializer.serializeToString(xmlDoc);
-                const xsdCodeString = serializer.serializeToString(xsdDoc);
-
-                return xmlCodeString.includes(xsdCodeString);
-            }
-        },
-        checkXSDWellFormed(xmlCode) {
-            const firstLine = xmlCode.split('\n')[0];
-            const isXmlDeclaration = /^\s*<\?xml\s/.test(firstLine);
-
-            if (!isXmlDeclaration) {
-                this.xmlDeclPresent = false;
-            } else {
-                this.xmlDeclPresent = true;
+                str = '';
             }
 
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlCode, "application/xml");
-            const parseErrors = xmlDoc.querySelectorAll("parsererror");
 
-            const errorMsgs = [];
 
-            if (parseErrors.length > 0) {
-                for (let i = 0; i < parseErrors.length; i++) {
-                    const error = parseErrors[i];
-                    errorMsgs.push(error.textContent.trim());
-                }
+            this.validation_errors.forEach(function (err) {
+                let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+            })
+
+            if (!this.xmlToXsdLink) {
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp; XML Document and XSD are not linked<br>';
             }
 
-            if (parseErrors.length != 0) {
-                this.syntaxErrors = true;
-            } else {
-                this.syntaxErrors = false;
-            }
+            this.errorXMLString = str;
+        }
+    },
+    async created() {
+        let data = await this.isXMLValid(this.xml_code, this.xsd_code, this.xsd_filename);
+        this.xmlValidation = data.xml_valid_on_xsd;
+        this.xsdCorrect = data.xsd_correct;
+        this.xmlToXsdLink = data.xml_to_xsd_link;
+        this.xmlWellFormed = data.xml_wellformed;
+        this.xsd_errors = data.xsd_errors;
+        this.validation_errors = data.validation_errors;
 
-            return parseErrors.length == 0 && isXmlDeclaration;
-        },
+        let str = '';
+
+        if (this.xsd_errors != null) {
+            this.xsd_errors.forEach(function (err) {
+                let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+                str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+            })
+
+            this.errorXSDString = str;
+
+            str = '';
+        }
+
+        this.validation_errors.forEach(function (err) {
+            let tmp = err.charAt(0).toUpperCase() + err.slice(1);
+            str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp;' + tmp + "<br>";
+        })
+
+        if (!this.xmlToXsdLink) {
+            str += '<i class="fa-solid fa-triangle-exclamation"></i> &nbsp; XML Document and XSD are not linked<br>';
+        }
+
+        this.errorXMLString = str;
     }
 }
 
 </script>
 
 <style scoped>
-.well-formed {
+.valid {
     background-color: #0092b2;
     color: #111111;
     border: 1px solid #111111;
 }
 
-.not-well-formed {
+.invalid {
     background-color: #111111;
     color: #0092b2;
     border: 1px solid #0092b2;
@@ -140,20 +173,48 @@ button:disabled {
     cursor: default;
 }
 
-.xsd-status {
-    padding-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-    flex-direction: row;
-    gap: 5px;
-    text-align: left;
-}
-
-.xsd-status > button {
+button {
     font-family: "Euclid";
     font-weight: lighter;
     border-radius: 40px;
     padding: 10px 20px;
     transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+}
+
+.xsd-status {
+    padding-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+    gap: 5px;
+    text-align: right;
+}
+
+.popupXSD,
+.popupXML {
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+    display: block;
+    position: absolute;
+    bottom: calc(20vh);
+    right: calc(50% - 240px);
+    width: 210px;
+    text-align: left;
+    white-space: pre-wrap;
+    padding: 10px;
+    padding-top: 0px;
+    font-size: 12px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+    border-radius: 0px;
+    background-color: #c7c7c7;
+    color: #111111;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    z-index: 5;
+}
+
+.popupXSD>p,
+.popupXML>p {
+    padding-left: 5px;
 }
 </style>

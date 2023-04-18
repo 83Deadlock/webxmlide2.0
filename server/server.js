@@ -152,14 +152,14 @@ app.post('/validate-dtd', async (req, res) => {
 
     const xmlLines = xmlCodeLines.filter((str) => str !== ''); // Removes any empty lines
 
-    let xmlToDdtLinkFlag = false;
+    let xmlToDtdLinkFlag = false;
 
     // The DTD link should be the second line in the XML Document
 
     if (xmlLines.length > 1) {
       const dtdLinkLine = xmlLines[1];
       if (dtdLinkLine == strExp) {
-        xmlToDdtLinkFlag = true;
+        xmlToDtdLinkFlag = true;
         logStr += "\n\t[XML AND DTD ARE LINKED]";
       } else {
         logStr += "\n\t[XML AND DTD ARE NOT LINKED]";
@@ -199,7 +199,7 @@ app.post('/validate-dtd', async (req, res) => {
     let responseObject = {
       xml_wellformed: xmlWellFormedFlag,
       dtd_correct: dtdCorrectFlag,
-      xml_to_dtd_link: xmlToDdtLinkFlag,
+      xml_to_dtd_link: xmlToDtdLinkFlag,
       xml_valid_on_dtd: isValid,
       dtd_errors: dtdErrorsStrArr,
       validation_errors: validationErrorsStr
@@ -272,36 +272,178 @@ app.post('/dtd-to-xsd', async (req, res) => {
 
 var libxmljs2 = require('libxmljs2');
 
-app.post('/run-xpath', async (req,res) => {
+app.post('/run-xpath', async (req, res) => {
   let logStr = "\n\n\nPOST ON /run-xpath";
   const xml = req.body.xml_code;
   let xmlWellFormed = validator.loadXmlFromString(xml);
   let outputStr = "";
 
-  if(validator.WellFormedErrors) {
+  if (validator.WellFormedErrors) {
     logStr += "\n\t[XML NOT WELL-FORMED]";
     outputStr = "XML is not well-formed.\nXPath can't run expressions on non-well-formed documents."
   } else {
     var xmlDoc = libxmljs2.parseXml(xml);
-  
+
     const xpath_exp = req.body.xpath;
     var result = xmlDoc.find(xpath_exp);
-    if(result == null){
+    if (result == null) {
       outputStr = "Invalid XPath Expression.";
-    } else if(result == ''){
+    } else if (result == '') {
       outputStr = "No results found.";
     } else {
       result.forEach(elem => outputStr += elem.text() + "\n");
       outputStr = outputStr.trim().replace(/\n+$/, '');
     }
 
-    console.log(typeof(outputStr));
+    console.log(typeof (outputStr));
     logStr += "\n\t[RESULT]\n\t\t-> " + outputStr;
   }
 
   validator.freeXml();
   console.log(logStr);
-  res.send({ output: outputStr})
+  res.send({ output: outputStr })
+});
+
+
+app.post('/validate-xsd', async (req, res) => {
+  let logStr = "\n\n\nPOST ON /validate-xsd";
+  const xml = req.body.xml_code;
+  const xsd = req.body.xsd_code;
+  let xsdFileName = req.body.xsd_filename;
+
+  if (xsdFileName == '') {
+    xsdFileName = "Example.xsd";
+  }
+
+  try {
+
+    // Creating DTD Temp file
+
+    const xsd_path = path.join(__dirname, 'temp', xsdFileName);
+
+    if (!fs.existsSync(path.join(__dirname, 'temp'))) {
+      fs.mkdirSync(path.join(__dirname, 'temp'));
+    }
+
+    await new Promise((resolve, reject) => {
+      fs.writeFile(xsd_path, xsd, function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          logStr += "\n\t[XSD Temp File Saved]";
+          resolve();
+        }
+      });
+    });
+
+    // Analyzing XML
+
+    let xmlIsWellFormed = validator.loadXmlFromString(xml);
+
+    let xmlWellFormedFlag = false;
+
+    if (validator.wellformedErrors) {
+      logStr += "\n\t[XML LOADING ERROR]";
+    } else {
+      logStr += "\n\t[XML LOADING SUCESSFUL]";
+      xmlWellFormedFlag = true;
+    }
+
+    //END
+
+    // Analyzing DTD
+
+    validator.loadSchemas([xsd_path]);
+    let xsdCorrectFlag = false;
+    let xsdErrorsStrArr = [];
+    if (validator.schemasLoadedErrors) {
+      logStr += "\n\t[XSD PARSING ERROR]";
+      let xsdErrors = validator.schemasLoadedErrors;
+      xsdErrors.forEach(function (obj) {
+        if (typeof (obj) != "string") {
+          let errorStr = obj.message.trim();
+          errorStr += " at Line " + obj.line + ", Column " + obj.column;
+          xsdErrorsStrArr.push(errorStr);
+        }
+      });
+    } else {
+      logStr += "\n\t[XSD PARSING SUCESS]";
+      xsdCorrectFlag = true;
+    }
+
+    //End
+
+    //Checking if XML and XSD are linked
+
+    let xmlToXsdLinkFlag = false;
+
+    const { DOMParser } = require('xmldom');
+
+
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xml, 'application/xml');
+
+    // Get the namespace of the root element in the XML document
+    const namespace = xmlDoc.documentElement.namespaceURI;
+
+    // Check if the namespace is the same as the XSD namespace
+    const isReferencingXsd = xmlDoc.documentElement.getAttribute('xsi:schemaLocation').includes(xsdFileName);
+
+    xmlToXsdLinkFlag = isReferencingXsd;
+
+    if (xmlToXsdLinkFlag) {
+      logStr += "\n\t[XML AND XSD ARE LINKED]";
+    } else {
+      logStr += "\n\t[XML AND XSD ARE NOT LINKED]";
+    }
+
+    //END
+    // Validating XML against DTD
+
+    let isValid = validator.validateAgainstSchemas();
+    let validationErrorsStr = [];
+
+    if (isValid) {
+      isValid = true;
+      console.log("TESTE DE TRUE", isValid)
+      logStr += "\n\t[XML VALID AGAINST XSD]";
+    } else if (xsdCorrectFlag) {
+      logStr += "\n\t[XML INVALID AGAINST XSD]";
+      let validationErrorsTmp = validator.validationSchemaErrors[xsd_path];
+
+      validationErrorsTmp.forEach(function (obj) {
+        if (typeof (obj) != "string") {
+          let errorStr = obj.message.trim();
+          errorStr += " at Line " + obj.line + ", Column " + obj.column;
+          validationErrorsStr.push(errorStr);
+        }
+      });
+    } else {
+      isValid = false;
+      logStr += "\n\t[XML INVALIDATION FAILED AGAINST INCORRECT XSD]";
+    }
+
+    validator.freeXml();
+    validator.freeSchemas();
+
+    let responseObject = {
+      xml_wellformed: xmlWellFormedFlag,
+      xsd_correct: xsdCorrectFlag,
+      xml_to_xsd_link: xmlToXsdLinkFlag,
+      xml_valid_on_xsd: isValid,
+      xsd_errors: xsdErrorsStrArr,
+      validation_errors: validationErrorsStr
+    };
+
+    console.log(logStr);
+    console.log("\n\t[SERVER RESPONSE] ", responseObject);
+    console.log('-#-#-#-#-#-#-#-#-#');
+    res.send(responseObject);
+
+  } catch (error) {
+    console.error(error);
+    res.send({ valid: false, correct: false });
+  }
 });
 
 app.listen(port, () => {

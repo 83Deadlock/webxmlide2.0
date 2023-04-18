@@ -69,7 +69,7 @@ export default {
     },
     methods: {
         async isXMLValid(xmlCode, dtdCode, dtdFilename) {
-            const response = await fetch('http://localhost:3000/validate-dtd', {
+            const response = await fetch('http://localhost:3000/validate-xsd', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
