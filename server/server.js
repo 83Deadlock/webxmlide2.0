@@ -121,50 +121,41 @@ app.post('/validate-dtd', async (req, res) => {
 
     // Checking if XML and DTD are linked
 
-    let dtdCodeLines = dtd.split('\n');
-    let dtdLines = dtdCodeLines.filter((line) => line.startsWith("<!ELEMENT"));
-    const elementRegex = /<!ELEMENT\s(\w+)\s/;
-    const elemsMap = new Map();
-    let elems = [];
-    dtdLines.forEach(function (line) {
-      let match = line.match(elementRegex);
-      elems.push(match[1]);
-      elemsMap.set(match[1], 0);
-    });
-    let xmlElements = dtdLines.join();
-
-    elems.forEach(function (elem) {
-      let elemRegEx = elem + " ";
-      let regex = new RegExp(elemRegEx, "g")
-      var count = (xmlElements.match(regex) || []).length;
-      elemsMap.set(elem, count);
-    });
+    let dtdInfo = validator.getDtd();
+    console.log(dtdInfo);
 
     // Min gets the element less mentioned which will be the root element
-    const min = [...elemsMap.entries()].reduce((accumulator, element) => {
-      return element[1] < accumulator[1] ? element : accumulator;
-    });
+    let xmlToDdtLinkFlag = false;
+    if(dtd != ""){
+      let xmlDTDFilename = dtdInfo.systemId;
+      let xmlNodeElement = dtdInfo.name;
+    
+      let dtdCodeLines = dtd.split('\n');
+  
+      const dtdLines = dtdCodeLines.filter((str) => str !== ''); // Removes any empty lines
+  
+      const elemLineRegEx = /<!ELEMENT\s+(\w+)\s+/;
 
-    let nodeElement = min[0];
+      let dtdElems = dtdLines.filter((line) => line.startsWith("<!ELEMENT"));
 
-    let strExp = '<!DOCTYPE ' + nodeElement + ' SYSTEM "' + dtdFileName + '">'
+      dtdElems.forEach(function (line) {
+        let match = line.match(elemLineRegEx);
+        if(match[1] == xmlNodeElement){
+          xmlToDdtLinkFlag = (xmlDTDFilename == dtdFileName);
+          return;
+        }
+      });
 
-    let xmlCodeLines = xml.split('\n');
-
-    const xmlLines = xmlCodeLines.filter((str) => str !== ''); // Removes any empty lines
-
-    let xmlToDtdLinkFlag = false;
-
-    // The DTD link should be the second line in the XML Document
-
-    if (xmlLines.length > 1) {
-      const dtdLinkLine = xmlLines[1];
-      if (dtdLinkLine == strExp) {
-        xmlToDtdLinkFlag = true;
-        logStr += "\n\t[XML AND DTD ARE LINKED]";
-      } else {
-        logStr += "\n\t[XML AND DTD ARE NOT LINKED]";
+      if(!xmlToDdtLinkFlag){
+        logStr += "\n\t[XML AND DTD ARE NOT LINKED]\n";
+        if(xmlDTDFilename == dtdFileName){
+          logStr += "\t\tRoot element " + xmlNodeElement + " undefined in DTD;\n";
+        } else {
+          logStr += "\t\tSYSTEM filename " + xmlDTDFilename + " doesn't match DTD Filename: \"" + dtdFileName + "\" ;\n";
+        }
       }
+    } else {
+      logStr += "\n\t[XML AND DTD ARE NOT LINKED] EMPTY DTD\n";
     }
 
     //END
@@ -200,7 +191,7 @@ app.post('/validate-dtd', async (req, res) => {
     let responseObject = {
       xml_wellformed: xmlWellFormedFlag,
       dtd_correct: dtdCorrectFlag,
-      xml_to_dtd_link: xmlToDtdLinkFlag,
+      xml_to_dtd_link: xmlToDdtLinkFlag,
       xml_valid_on_dtd: isValid,
       dtd_errors: dtdErrorsStrArr,
       validation_errors: validationErrorsStr
