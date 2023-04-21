@@ -134,7 +134,8 @@ app.post('/validate-dtd', async (req, res) => {
     let xmlElements = dtdLines.join();
 
     elems.forEach(function (elem) {
-      let regex = new RegExp(elem, "g")
+      let elemRegEx = elem + " ";
+      let regex = new RegExp(elemRegEx, "g")
       var count = (xmlElements.match(regex) || []).length;
       elemsMap.set(elem, count);
     });
