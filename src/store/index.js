@@ -8,6 +8,8 @@ const store = createStore({
     xml_code: "", // Stores the XML Editors code
     dtd_code: "", // Stores the DTD Editors code
     xsd_code: "", // Stores the XSD Editors code
+    xslt_code: "", // Stores the XSLT Editors code
+    xslt_output: "", //store the XSLT output
     xpath_code: "", //Stores the XPath Input Expression
     xpath_output: "", //store the xpath output
     dtd_active: true,
@@ -38,6 +40,12 @@ const store = createStore({
     updateXSDCode(state, code){
       state.xsd_code = code;
     },
+    updateXSLTCode(state, code){
+      state.xslt_code = code;
+    },
+    changeXSLTOutput(state,code){
+      state.xslt_output = code;
+    },
     changeXPathCode(state,code){
       state.xpath_code = code;
     },
@@ -61,7 +69,6 @@ const store = createStore({
       state.xsd_active = state.xslt_active = state.xpath_active = false;
     },
     activateXSD(state){
-      console.log("xsd activated");
       state.xsd_active = true;
       state.dtd_active = state.xslt_active = state.xpath_active = false;
     },

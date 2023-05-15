@@ -39,7 +39,6 @@ export default {
             inputElement.setSelectionRange(0, 0);
         },
         async runXPath() {
-
             const response = await fetch('http://localhost:3000/run-xpath', {
                 method: 'POST',
                 headers: {

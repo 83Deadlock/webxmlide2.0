@@ -444,6 +444,36 @@ app.post('/validate-xsd', async (req, res) => {
   }
 });
 
+app.post('/validate-xs;t', async (req, res) => {
+  let logStr = "\n\n\nPOST ON /validate-xslt";
+  const xslt = req.body.xslt_code;
+
+  let xsltWellFormed = validator.loadXmlFromString(xslt);
+
+  if (validator.wellformedErrors) {
+    let WellFormedErrors = validator.wellformedErrors;
+    let WellFormedErrorsStr = [];
+
+    WellFormedErrors.forEach(function (obj) {
+      let errorStr = obj.message.trim();
+      errorStr += " at Line " + obj.line + ", Column " + obj.column;
+      WellFormedErrorsStr.push(errorStr);
+    });
+
+    logStr += "\n\t[XSLT IS NOT WELL FORMED]";
+
+    validator.freeXml();
+    console.log(logStr);
+
+    res.send({ wellFormed: false, errors: WellFormedErrorsStr });
+  } else {
+    logStr += "\n\t[XSLT WELL-FORMED]";
+    console.log(logStr);
+    console.log('-#-#-#-#-#-#-#-#-#');
+    res.send({ wellFormed: true, errors: [] });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
