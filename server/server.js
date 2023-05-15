@@ -283,7 +283,13 @@ app.post('/run-xpath', async (req, res) => {
     } else if (result == '') {
       outputStr = "No results found.";
     } else {
-      result.forEach(elem => outputStr += elem.text() + "\n");
+      result.forEach(elem => {
+        try{
+          outputStr += elem.text() + "\n"
+        } catch(e){
+          outputStr += elem + "\n"
+        }
+      });
       outputStr = outputStr.trim().replace(/\n+$/, '');
     }
 

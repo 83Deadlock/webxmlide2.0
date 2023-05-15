@@ -1,9 +1,4 @@
 <!ELEMENT bookstore (book+)>
-<!ELEMENT book (title, author+, year, price)>
+<!ELEMENT book (title,price)>
 <!ELEMENT title (#PCDATA)>
-<!ELEMENT author (#PCDATA)>
-<!ELEMENT year (#PCDATA)>
-<!ELEMENT price (#PCDATA)>
-
-<!ATTLIST book category CDATA #IMPLIED>
-<!ATTLIST title lang CDATA #IMPLIED>
+<!ELEMENT price (#PCDATA)> 
