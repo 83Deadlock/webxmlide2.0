@@ -1,15 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="https://www.w3schools.com"
+xmlns="https://www.w3schools.com"
+elementFormDefault="qualified">
 
-<bookstore>
+<xs:element name="note">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="to" type="xs:string"/>
+      <xs:element name="from" type="xs:string"/>
+      <xs:element name="heading" type="xs:string"/>
+      <xs:element name="body" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
 
-<book>
-  <title lang="en">Harry Potter</title>
-  <price>29.99</price>
-</book>
-
-<book>
-  <title lang="fr">Learning XML</title>
-  <price>39.95</price>
-</book>
-
-</bookstore>
+</xs:schema>

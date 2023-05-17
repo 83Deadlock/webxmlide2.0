@@ -9,10 +9,11 @@
             <button @click="runXPath" class="run-button">Run</button>
         </div>
         <div class="xpath-output">
-            <p style="white-space: pre-line">{{ outputValue }}</p>
+            <p class="scrollable-text">{{ outputValue }}</p>
         </div>
         <div class="xpath-help">
-            <p>XPath Functions, Examples and Documentation on the <span id="link">XPath Documentation Page</span>!</p>
+            <p>XPath Functions, Examples and Documentation on the <span id="link" @click="redirectToDocumentation">XPath
+                    Documentation Page</span>!</p>
         </div>
     </div>
 </template>
@@ -33,6 +34,9 @@ export default {
     },
     methods: {
         ...mapMutations(["changeXPathCode", "changeXPathOutput"]),
+        redirectToDocumentation() {
+            this.$router.push({ name: 'doc', path: '/doc' });
+        },
         inputOnBlur() {
             const inputElement = this.$refs.input;
             this.$store.commit("changeXPathCode", this.inputValue);
@@ -123,6 +127,33 @@ strong {
     height: calc(65vh - 52px);
     width: 100%;
     background-color: #111111;
+    overflow-y: auto;
+}
+
+.scrollable-text {
+    padding-left: 15px;
+    color: #c3c3c3;
+    white-space: pre-line;
+    overflow-wrap: break-word;
+    /* Wrap long lines */
+}
+
+/* Customize the scrollbar */
+.xpath-output::-webkit-scrollbar {
+    width: 8px;
+}
+
+.xpath-output::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+}
+
+.xpath-output::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.xpath-output::-webkit-scrollbar-track {
+    background-color: #333;
 }
 
 .xpath-output>p {
@@ -135,12 +166,15 @@ strong {
     flex-direction: column;
     gap: 12px;
 }
+
 .xpath-help {
     text-align: right;
 }
 
 #link {
     text-decoration: underline;
+    cursor: pointer;
     color: #0092b2;
 }
+
 </style>

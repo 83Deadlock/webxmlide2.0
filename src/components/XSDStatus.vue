@@ -48,11 +48,6 @@ export default {
             handler: function () {
                 this.validateXML();
             }
-        },
-        xsd_filename: {
-            handler: function () {
-                this.validateXML();
-            }
         }
     },
     computed: {

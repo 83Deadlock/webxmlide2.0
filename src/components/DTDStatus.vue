@@ -69,7 +69,7 @@ export default {
     },
     methods: {
         async isXMLValid(xmlCode, dtdCode, dtdFilename) {
-            const response = await fetch('http://localhost:3000/validate-xsd', {
+            const response = await fetch('http://localhost:3000/validate-dtd', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,6 +91,14 @@ export default {
             this.xmlWellFormed = data.xml_wellformed;
             this.dtd_errors = data.dtd_errors;
             this.validation_errors = data.validation_errors;
+
+            if(this.dtd_errors == undefined){
+            this.dtd_errors = []
+        }
+
+        if(this.validation_errors == undefined){
+            this.validation_errors = []
+        }
 
             let str = '';
 
@@ -123,6 +131,14 @@ export default {
         this.xmlWellFormed = data.xml_wellformed;
         this.dtd_errors = data.dtd_errors;
         this.validation_errors = data.validation_errors;
+
+        if(this.dtd_errors == undefined){
+            this.dtd_errors = []
+        }
+
+        if(this.validation_errors == undefined){
+            this.validation_errors = []
+        }
 
         let str = '';
 

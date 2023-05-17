@@ -126,7 +126,7 @@ app.post('/validate-dtd', async (req, res) => {
 
     // Min gets the element less mentioned which will be the root element
     let xmlToDdtLinkFlag = false;
-    if(dtd != ""){
+    if(dtd != "" && dtdInfo != null){
       let xmlDTDFilename = dtdInfo.systemId;
       let xmlNodeElement = dtdInfo.name;
     
@@ -154,7 +154,10 @@ app.post('/validate-dtd', async (req, res) => {
           logStr += "\t\tSYSTEM filename " + xmlDTDFilename + " doesn't match DTD Filename: \"" + dtdFileName + "\" ;\n";
         }
       }
-    } else {
+    } else if(dtdInfo == null){
+      logStr += "\n\t[XML AND DTD ARE NOT LINKED] NO LINK STATEMENT\n";
+    }
+    else {
       logStr += "\n\t[XML AND DTD ARE NOT LINKED] EMPTY DTD\n";
     }
 
@@ -444,7 +447,7 @@ app.post('/validate-xsd', async (req, res) => {
   }
 });
 
-app.post('/validate-xs;t', async (req, res) => {
+app.post('/validate-xslt', async (req, res) => {
   let logStr = "\n\n\nPOST ON /validate-xslt";
   const xslt = req.body.xslt_code;
 
@@ -465,12 +468,12 @@ app.post('/validate-xs;t', async (req, res) => {
     validator.freeXml();
     console.log(logStr);
 
-    res.send({ wellFormed: false, errors: WellFormedErrorsStr });
+    res.send({ xslt_correct: false, xslt_errors: WellFormedErrorsStr });
   } else {
     logStr += "\n\t[XSLT WELL-FORMED]";
     console.log(logStr);
     console.log('-#-#-#-#-#-#-#-#-#');
-    res.send({ wellFormed: true, errors: [] });
+    res.send({ xslt_correct: true, xslt_errors: [] });
   }
 });
 

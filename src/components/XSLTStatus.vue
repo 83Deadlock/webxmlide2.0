@@ -30,15 +30,10 @@ export default {
             handler: function () {
                 this.validateXML();
             }
-        },
-        xslt_filename: {
-            handler: function () {
-                this.validateXML();
-            }
         }
     },
     computed: {
-        ...mapState(["xslt_code", "xslt_filename"]),
+        ...mapState(["xslt_code"]),
         buttonMessageXSLT() {
             return this.xsltCorrect ? "Valid XSLT" : "Invalid XSLT";
         },
@@ -74,6 +69,7 @@ export default {
     },
     async created() {
         let data = await this.isXMLValid(this.xslt_code);
+            console.log(data.xslt_correct);
             this.xsltCorrect = data.xslt_correct;
             this.xslt_errors = data.xslt_errors;
 
@@ -115,12 +111,8 @@ button {
 }
 
 .xslt-status {
-    padding-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-    flex-direction: row-reverse;
-    gap: 5px;
-    text-align: right;
+    padding-top: 12px;
+
 }
 
 .popupXSLT{
