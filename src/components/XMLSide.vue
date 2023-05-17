@@ -4,7 +4,8 @@
             <div class="xml-selector">
                 <p id="xml-tag">XML</p>
                 <i id="sep" class="fa-solid fa-chevron-right"></i>
-                <input @blur="fileNameOnBlur" v-model="inputValue" ref="input" id="fileName" type="text" placeholder="Example.xml">
+                <input @blur="fileNameOnBlur" v-model="inputValue" ref="input" id="fileName" type="text"
+                    placeholder="Example.xml">
                 <div v-if="hasError" class="error-icon" @mouseover="showErrorMessage" @mouseleave="hideErrorMessage">
                     <i class="fas fa-times"></i>
                     <div class="error-message" ref="errorMessage">File name should end with ".xml"</div>
@@ -14,13 +15,15 @@
                 </div>
             </div>
             <div class="upload-download-buttons">
-                <button id="upload_button" type="button" @click="handleUploadButtonClick"><i class="fas fa-upload"></i></button>
-                <button id="download_button" type="button" @click="handleDownloadButtonClick" :disabled="hasError"><i class="fas fa-download"></i></button>
+                <button id="upload_button" type="button" @click="handleUploadButtonClick"><i
+                        class="fas fa-upload"></i></button>
+                <button id="download_button" type="button" @click="handleDownloadButtonClick" :disabled="hasError"><i
+                        class="fas fa-download"></i></button>
             </div>
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileInputChange" accept=".xml" />
         </div>
         <div class="xml-middle">
-            <XMLEditor :xml-code="xmlCode"/>
+            <XMLEditor :xml-code="xmlCode"  />
         </div>
         <div class="xml-bottom">
             <div class="hints">
@@ -56,7 +59,7 @@ export default {
         };
     },
     computed: {
-        ...mapState(["xml_filename","xml_code"]),
+        ...mapState(["xml_filename", "xml_code"]),
         hasError() {
             return (this.inputValue && !this.inputValue.endsWith('.xml') && this.inputValue.length > 0);
         },
@@ -64,8 +67,8 @@ export default {
             return this.xml_code;
         },
     },
-    watch:{
-        xml_filename:{
+    watch: {
+        /*xml_filename:{
             handler: function () {
                 this.inputValue = this.xml_filename;
             }
@@ -74,7 +77,7 @@ export default {
             handler: function(){
                 this.xmlCode = this.xml_code;
             }
-        }
+        }*/
     },
     components: {
         XMLEditor,
@@ -82,10 +85,10 @@ export default {
     },
     methods: {
         ...mapMutations(["changeXMLFilename"]),
-        showHints(){
+        showHints() {
             this.showHintsBox = true;
         },
-        hideHints(){
+        hideHints() {
             this.showHintsBox = false;
         },
         fileNameOnBlur() {
@@ -113,11 +116,11 @@ export default {
             };
             reader.readAsText(file);
         },
-        handleDownloadButtonClick(){
+        handleDownloadButtonClick() {
             const code = this.xml_code;
             var filename = this.inputValue;
 
-            if(filename == ''){
+            if (filename == '') {
                 filename = 'Example.xml';
             }
 
@@ -276,15 +279,15 @@ export default {
 }
 
 .hints {
-  display: inline-block;
-  position: relative;
+    display: inline-block;
+    position: relative;
 }
 
 .hint-icon {
-  display: inline-block;
-  color:#bbbbbb;
-  padding-top: 10px;
-  transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+    display: inline-block;
+    color: #bbbbbb;
+    padding-top: 10px;
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
 }
 
 .hint-icon:hover {
@@ -293,32 +296,31 @@ export default {
 
 .hints-box {
     transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
-  display: none;
-  position: absolute;
-  top: -120px;
-  left: -10px;
-  width: 180px;
-  white-space: pre-wrap;
-  padding: 5px;
-  border-radius: 0px;
-  background-color: #c7c7c7;
-  color: #111111;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    display: none;
+    position: absolute;
+    top: -120px;
+    left: -10px;
+    width: 180px;
+    white-space: pre-wrap;
+    padding: 5px;
+    border-radius: 0px;
+    background-color: #c7c7c7;
+    color: #111111;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
 }
 
 .hints-box.active {
-  display: block;
+    display: block;
 }
 
 .hint-text {
-  font-size: 12px;
-  line-height: 1.2;
-  margin: 0;
-  padding: 0;
+    font-size: 12px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
 }
 
 .wellformed_error {
     color: #7c7c7c;
     padding-right: 5px;
-}
-</style>
+}</style>

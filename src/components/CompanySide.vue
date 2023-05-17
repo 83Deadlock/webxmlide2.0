@@ -231,7 +231,7 @@ export default {
         this.xsdCode = this.xsd_code;
     },
     watch: {
-        dtd_code:{
+        /*dtd_code:{
             handler: function(){
                 this.dtdCode = this.dtd_code;
             }
@@ -260,7 +260,7 @@ export default {
             handler: function () {
                 this.fileNameXSLT = this.xslt_filename;
             }
-        },
+        },*/
         dtd_active: {
             handler: function(){
                 if(this.dtd_active){

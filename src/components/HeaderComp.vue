@@ -54,6 +54,19 @@
 
       </div>
     </div>
+
+    <!-- Custom modal -->
+    <div v-if="uploadFinished" class="modalR">
+      <div class="modalR-content">
+        <h3>Upload Finished!</h3>
+        <p>Refresh the page to see the uploaded content.</p>
+        <div class="RefreshButton">
+
+          <button @click="refreshPage">Refresh</button>
+        </div>
+
+      </div>
+    </div>
   </nav>
 </template>
 
@@ -82,7 +95,8 @@ export default {
       includeXML: false,
       includeDTD: false,
       includeXSD: false,
-      includeXSLT: false
+      includeXSLT: false,
+      uploadFinished: false
     };
   },
   methods: {
@@ -228,7 +242,10 @@ export default {
           default:
             break;
         }
+
       });
+
+      this.uploadFinished = true;
     },
     clearComponentData() {
       // Clear existing component data
@@ -241,6 +258,11 @@ export default {
       this.updateXSLTCode('');
       this.changeXSLTFilename('');
     },
+    refreshPage() {
+      // Reload the page to see the uploaded content
+      location.reload();
+      this.uploadFinished = false;
+    }
   }
 }
 </script>
@@ -304,6 +326,10 @@ button {
   transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
 }
 
+.RefreshButton {
+  text-align: right;
+}
+
 button:hover {
   background-color: black !important;
   cursor: pointer;
@@ -326,12 +352,34 @@ button:hover {
   z-index: 10000;
 }
 
+.modalR {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
 .modal-content {
   background-color: #272727;
   padding-left: 10px;
   padding-right: 10px;
   padding-bottom: 5px;
   border-radius: 5px;
+}
+
+.modalR-content {
+  background-color: #272727;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  text-align: left;
 }
 
 .checkbox {
