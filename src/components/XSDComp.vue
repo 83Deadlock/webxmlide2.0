@@ -4,7 +4,6 @@
     </div>
     <div class="xsd-bottom">
         <XSDStatus />
-        <h3>XSD ACTIONS</h3>
     </div>
 </template>
 

@@ -59,7 +59,7 @@
 
 <script>
 
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import JSZip from 'jszip';
 
 export default {
@@ -86,9 +86,9 @@ export default {
     };
   },
   methods: {
+    ...mapMutations(["updateXMLCode", "updateDTDCode", "updateXSDCode", "updateXSLTCode", "changeXMLFilename", "changeDTDFilename", "changeXSDFilename", "changeXSLTFilename"]),
     fileNameOnBlur() {
       const inputElement = this.$refs.input;
-      this.$store.commit("changeXSLTFilename", this.fileNameXSLT);
       inputElement.setSelectionRange(0, 0);
     },
     onClickDownload() {
@@ -97,6 +97,22 @@ export default {
     closeModal() {
       console.log('ESC worked');
       this.showDownloadModal = false;
+    },
+    onClickUpload() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.zip';
+      input.addEventListener('change', this.handleFileUpload);
+      input.click();
+    },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        const zipContent = reader.result;
+        this.processZipFile(zipContent);
+      };
+      reader.readAsArrayBuffer(file);
     },
     downloadFiles() {
 
@@ -122,14 +138,7 @@ export default {
           srcFolder.file(file.name, file.content);
         });
 
-        const manifest = `
-        <?xml version="1.0" encoding="UTF-8"?>
-        <project name="${projectName}">
-          <src>
-            ${selectedFiles.map((file) => `<${file.name.split('.')[1]}>${file.name}</${file.name.split('.')[1]}>`).join('')}
-          </src>
-        </project>
-        `;
+        const manifest = `<?xml version="1.0" encoding="UTF-8"?><project name="${projectName}"><src>${selectedFiles.map((file) => `<${file.name.split('.')[1]}>${file.name}</${file.name.split('.')[1]}>`).join('')}</src></project>`;
 
         zip.file('manifest.xml', manifest);
         zip.generateAsync({ type: 'blob' }).then((blob) => {
@@ -141,13 +150,97 @@ export default {
           window.URL.revokeObjectURL(url);
         });
 
-
         // Close the modal
         this.showDownloadModal = false;
       }
 
+    },
+    processZipFile(zipContent) {
+      JSZip.loadAsync(zipContent)
+        .then((zip) => {
+          const manifest = zip.file('manifest.xml');
+          const srcFolder = zip.folder('src');
 
-    }
+          if (!manifest || !srcFolder) {
+            alert('Invalid project structure. Please upload a valid .zip file.');
+            return;
+          }
+
+          manifest.async('text').then((manifestContent) => {
+            // Parse the manifest.xml content
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(manifestContent, 'text/xml');
+            //const projectName = xmlDoc.querySelector('project').getAttribute('name');
+            const srcFiles = xmlDoc.querySelectorAll('src > *');
+
+            // Check if the src folder contains all the files mentioned in the manifest
+            const missingFiles = Array.from(srcFiles).filter((file) => !srcFolder.file(file.textContent));
+            if (missingFiles.length > 0) {
+              const missingFileNames = Array.from(missingFiles).map((file) => file.textContent).join(', ');
+              alert(`The following files mentioned in the manifest are missing in the src folder: ${missingFileNames}`);
+              return;
+            }
+
+            // Update component data based on src files and manifest
+            this.updateComponentData(srcFolder, srcFiles);
+          });
+        })
+        .catch((error) => {
+          console.error('Error loading the zip file:', error);
+          alert('An error occurred while processing the zip file. Please try again.');
+        });
+    },
+    updateComponentData(srcFolder, srcFiles) {
+      // Clear existing component data if necessary
+      this.clearComponentData();
+
+      // Update component data based on src files and manifest
+      srcFiles.forEach((file) => {
+        const fileType = file.tagName;
+        const fileName = file.textContent;
+        const fileContentPromise = srcFolder.file(fileName).async('text');
+
+        switch (fileType) {
+          case 'xml':
+            fileContentPromise.then((content) => {
+              this.updateXMLCode(content);
+              this.changeXMLFilename(fileName);
+            });
+            break;
+          case 'dtd':
+            fileContentPromise.then((content) => {
+              this.updateDTDCode(content);
+              this.changeDTDFilename(fileName);
+            });
+            break;
+          case 'xsd':
+            fileContentPromise.then((content) => {
+              this.updateXSDCode(content);
+              this.changeXSDFilename(fileName);
+            });
+            break;
+          case 'xslt':
+            fileContentPromise.then((content) => {
+              this.updateXSLTCode(content);
+              this.changeXSLTFilename(fileName);
+            });
+            break;
+          default:
+            break;
+        }
+      });
+    },
+    clearComponentData() {
+      // Clear existing component data
+      this.updateXMLCode('');
+      this.changeXMLFilename('');
+      this.updateDTDCode('');
+      this.changeDTDFilename('');
+      this.updateXSDCode('');
+      this.changeXSDFilename('');
+      this.updateXSLTCode('');
+      this.changeXSLTFilename('');
+    },
   }
 }
 </script>

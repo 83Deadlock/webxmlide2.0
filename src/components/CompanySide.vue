@@ -74,7 +74,7 @@
         <div class="company-mid-bot">
             <DTDComp v-if="dtdActive" :dtd-prop="dtdCode"/>
             <XSDComp v-if="xsdActive" :xsd-prop="xsdCode"/>
-            <XSLTComp v-if="xsltActive"/>
+            <XSLTComp v-if="xsltActive" :xslt-prop="xsltCode"/>
             <XPathComp v-if="xpathActive"/>
         </div>
     </div>
@@ -106,6 +106,7 @@ export default {
             fileNameXSLT: '',
             dtdCode: '',
             xsdCode: '',
+            xsltCode: ''
         }
     },
     methods: {
@@ -230,6 +231,36 @@ export default {
         this.xsdCode = this.xsd_code;
     },
     watch: {
+        dtd_code:{
+            handler: function(){
+                this.dtdCode = this.dtd_code;
+            }
+        },
+        xsd_code:{
+            handler: function(){
+                this.xsdCode = this.xsd_code;
+            }
+        },
+        xslt_code:{
+            handler: function(){
+                this.xsltCode = this.xslt_code;
+            }
+        },
+        dtd_filename:{
+            handler: function () {
+                this.fileNameDTD = this.dtd_filename;
+            }
+        },
+        xsd_filename:{
+            handler: function () {
+                this.fileNameXSD = this.xsd_filename;
+            }
+        },
+        xslt_filename:{
+            handler: function () {
+                this.fileNameXSLT = this.xslt_filename;
+            }
+        },
         dtd_active: {
             handler: function(){
                 if(this.dtd_active){

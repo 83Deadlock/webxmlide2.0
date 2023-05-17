@@ -1,6 +1,5 @@
-<!ELEMENT note (hi)>
-
-<!ELEMENT hi (#PCDATA)>
-<!ELEMENT author (#PCDATA)>
-<!ELEMENT year (#PCDATA)>
-<!ELEMENT price (#PCDATA)>
+<!ELEMENT note (to,from,heading,body)>
+<!ELEMENT to (#PCDATA)>
+<!ELEMENT from (#PCDATA)>
+<!ELEMENT heading (#PCDATA)>
+<!ELEMENT body (#PCDATA)>

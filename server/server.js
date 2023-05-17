@@ -126,35 +126,35 @@ app.post('/validate-dtd', async (req, res) => {
 
     // Min gets the element less mentioned which will be the root element
     let xmlToDdtLinkFlag = false;
-    if(dtd != "" && dtdInfo != null){
+    if (dtd != "" && dtdInfo != null) {
       let xmlDTDFilename = dtdInfo.systemId;
       let xmlNodeElement = dtdInfo.name;
-    
+
       let dtdCodeLines = dtd.split('\n');
-  
+
       const dtdLines = dtdCodeLines.filter((str) => str !== ''); // Removes any empty lines
-  
+
       const elemLineRegEx = /<!ELEMENT\s+(\w+)\s+/;
 
       let dtdElems = dtdLines.filter((line) => line.startsWith("<!ELEMENT"));
 
       dtdElems.forEach(function (line) {
         let match = line.match(elemLineRegEx);
-        if(match[1] == xmlNodeElement){
+        if (match[1] == xmlNodeElement) {
           xmlToDdtLinkFlag = (xmlDTDFilename == dtdFileName);
           return;
         }
       });
 
-      if(!xmlToDdtLinkFlag){
+      if (!xmlToDdtLinkFlag) {
         logStr += "\n\t[XML AND DTD ARE NOT LINKED]\n";
-        if(xmlDTDFilename == dtdFileName){
+        if (xmlDTDFilename == dtdFileName) {
           logStr += "\t\tRoot element " + xmlNodeElement + " undefined in DTD;\n";
         } else {
           logStr += "\t\tSYSTEM filename " + xmlDTDFilename + " doesn't match DTD Filename: \"" + dtdFileName + "\" ;\n";
         }
       }
-    } else if(dtdInfo == null){
+    } else if (dtdInfo == null) {
       logStr += "\n\t[XML AND DTD ARE NOT LINKED] NO LINK STATEMENT\n";
     }
     else {
@@ -241,22 +241,22 @@ app.post('/dtd-to-xsd', async (req, res) => {
           reject(err);
         } else {
           logStr += "\n\t[DTD Temp File Saved]";
+          const { exec } = require('child_process');
+
+          exec(`java -jar ${jar_path} ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
+            if (err) {
+              console.error(`Trang execution failed: ${err}`);
+              return;
+            }
+            logStr += "SUCCESS!";
+          });
           resolve();
         }
       });
     });
 
-    const { exec } = require('child_process');
-
-    exec(`java -jar ${jar_path} ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
-      if (err) {
-        console.error(`Trang execution failed: ${err}`);
-        return;
-      }
-      console.log("SUCCESS!");
-    });
-
     let result = fs.readFileSync(xsd_path).toString();
+    console.log(logStr);
     res.send({ xsd_code: result, xsd_filename: xsdFileName });
 
   } catch (error) {
@@ -287,9 +287,9 @@ app.post('/run-xpath', async (req, res) => {
       outputStr = "No results found.";
     } else {
       result.forEach(elem => {
-        try{
+        try {
           outputStr += elem.text() + "\n"
-        } catch(e){
+        } catch (e) {
           outputStr += elem + "\n"
         }
       });
@@ -384,19 +384,20 @@ app.post('/validate-xsd', async (req, res) => {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xml, 'application/xml');
 
-    // Get the namespace of the root element in the XML document
-    const namespace = xmlDoc.documentElement.namespaceURI;
-
     // Check if the namespace is the same as the XSD namespace
-    const isReferencingXsd = xmlDoc.documentElement.getAttribute('xsi:schemaLocation').includes(xsdFileName);
+    if (xmlDoc.documentElement) {
+      const isReferencingXsd = xmlDoc.documentElement.getAttribute('xsi:schemaLocation').includes(xsdFileName);
 
-    xmlToXsdLinkFlag = isReferencingXsd;
+      xmlToXsdLinkFlag = isReferencingXsd;
 
-    if (xmlToXsdLinkFlag) {
-      logStr += "\n\t[XML AND XSD ARE LINKED]";
-    } else {
-      logStr += "\n\t[XML AND XSD ARE NOT LINKED]";
+      if (xmlToXsdLinkFlag) {
+        logStr += "\n\t[XML AND XSD ARE LINKED]";
+      } else {
+        logStr += "\n\t[XML AND XSD ARE NOT LINKED]";
+      }
     }
+
+
 
     //END
     // Validating XML against DTD

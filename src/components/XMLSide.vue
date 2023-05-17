@@ -64,6 +64,18 @@ export default {
             return this.xml_code;
         },
     },
+    watch:{
+        xml_filename:{
+            handler: function () {
+                this.inputValue = this.xml_filename;
+            }
+        },
+        xml_code:{
+            handler: function(){
+                this.xmlCode = this.xml_code;
+            }
+        }
+    },
     components: {
         XMLEditor,
         XMLStatus
