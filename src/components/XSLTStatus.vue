@@ -119,8 +119,8 @@ button {
     transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
     display: block;
     position: absolute;
-    bottom: calc(20vh);
-    right: calc(50% - 240px);
+    top: calc(46vh);
+    left: calc(58vw);
     width: 210px;
     text-align: left;
     white-space: pre-wrap;
