@@ -9,7 +9,7 @@
             <button @click="runXPath" class="run-button">Run</button>
         </div>
         <div class="xpath-output">
-            <p class="scrollable-text" v-html="outputValue"></p>
+            <p class="scrollable-text">{{ outputValue }}</p>
         </div>
         <div class="xpath-help">
             <p>XPath Functions, Examples and Documentation on the <span id="link" @click="redirectToDocumentation">XPath

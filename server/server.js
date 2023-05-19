@@ -270,6 +270,8 @@ app.post('/dtd-to-xsd', async (req, res) => {
 var libxmljs2 = require('libxmljs2');
 
 app.post('/run-xpath', async (req, res) => {
+
+
   let logStr = "\n\n\nPOST ON /run-xpath";
   const xml = req.body.xml_code;
   let xmlWellFormed = validator.loadXmlFromString(xml);
@@ -288,18 +290,23 @@ app.post('/run-xpath', async (req, res) => {
     } else if (result == '') {
       outputStr = "No results found.";
     } else {
-      result.forEach(elem => {
-        try {
-          outputStr += elem.text() + "\n"
-        } catch (e) {
-          outputStr += elem + "\n"
-        }
-      });
+      
+      if (Array.isArray(result)) {
+        result.forEach(elem => {
+          console.log(elem.toString());
+          outputStr += elem + '\n';
+        });
+      } else {
+        // Handle the case when the result is not an array
+        // Add your code here or leave a comment for further assistance
+        // For example:
+        console.log(result.toString());
+        outputStr += result.toString() + '\n';
+      }
       outputStr = outputStr.trim().replace(/\n+$/, '');
     }
 
-    console.log(typeof (outputStr));
-    logStr += "\n\t[RESULT]\n\t\t-> " + outputStr;
+    logStr += "\n\t[RESULT]\n\t\t-> \n" + outputStr;
   }
 
   validator.freeXml();

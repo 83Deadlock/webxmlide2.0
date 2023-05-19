@@ -1,5 +1,5 @@
-<!ELEMENT note (to,from,heading,body)>
-<!ELEMENT to (#PCDATA)>
-<!ELEMENT from (#PCDATA)>
-<!ELEMENT heading (#PCDATA)>
-<!ELEMENT body (#PCDATA)>
+<!ELEMENT manifest (project,files)>
+<!ELEMENT project name>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT files (xml,dtd?,xsd?,xslt?)>
+<!ELEMENT price (#PCDATA)>
