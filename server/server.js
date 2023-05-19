@@ -153,6 +153,8 @@ app.post('/validate-dtd', async (req, res) => {
         } else {
           logStr += "\t\tSYSTEM filename " + xmlDTDFilename + " doesn't match DTD Filename: \"" + dtdFileName + "\" ;\n";
         }
+      } else {
+        logStr += "\n\t[XML AND DTD ARE LINKED]\n";
       }
     } else if (dtdInfo == null) {
       logStr += "\n\t[XML AND DTD ARE NOT LINKED] NO LINK STATEMENT\n";

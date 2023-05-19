@@ -1,5 +1,6 @@
 <template>
     <div class="xslt-actions">
+        <button @click="clearPreview">Clear Preview</button>
         <button @click="transformXML">Generate Preview</button>
     </div>
 </template>
@@ -27,7 +28,9 @@ export default {
         
             this.$store.commit('changeXSLTOutput', transformedHTML);
 
-            console.log(transformedHTML);
+        },
+        async clearPreview() {
+            this.$store.commit('changeXSLTOutput', 'This is where the output from running the XSLT Transformations will appear!');
         }
     }
 }
@@ -36,7 +39,6 @@ export default {
 <style scoped>
 .xslt-actions {
     padding-top: 12px;
-
 }
 
 button {
@@ -50,6 +52,7 @@ button {
     border-radius: 40px;
     padding: 10px 20px;
     transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+    margin-left: 10px;
 }
 
 button:hover {

@@ -9,11 +9,13 @@
             <button @click="runXPath" class="run-button">Run</button>
         </div>
         <div class="xpath-output">
-            <p class="scrollable-text">{{ outputValue }}</p>
+            <p class="scrollable-text" v-html="outputValue"></p>
         </div>
         <div class="xpath-help">
             <p>XPath Functions, Examples and Documentation on the <span id="link" @click="redirectToDocumentation">XPath
                     Documentation Page</span>!</p>
+            <button @click="clearPreview">Clear Results</button>
+            
         </div>
     </div>
 </template>
@@ -57,6 +59,10 @@ export default {
 
             this.outputValue = data.output;
             this.$store.commit("changeXPathOutput", this.outputValue);
+        },
+        clearPreview() {
+            this.$store.commit("changeXPathOutput", 'This is where the output from running the XPath Expression will appear!');
+            this.outputValue = 'This is where the output from running the XPath Expression will appear!';
         }
     },
     mounted() {
@@ -169,12 +175,32 @@ strong {
 
 .xpath-help {
     text-align: right;
+    display: flex;
+    justify-content: space-between;
 }
 
 #link {
     text-decoration: underline;
     cursor: pointer;
     color: #0092b2;
+}
+
+button {
+    background-color: #111111;
+    border: 1px solid #0092b2;
+    color: #0092b2;
+
+    cursor: pointer;
+    font-family: "Euclid";
+    font-weight: lighter;
+    border-radius: 40px;
+    padding: 10px 20px;
+    transition: all 0.2s cubic-bezier(.25, .50, .75, 1);
+    margin-left: 10px;
+}
+
+button:hover {
+    background-color: #000000;
 }
 
 </style>
