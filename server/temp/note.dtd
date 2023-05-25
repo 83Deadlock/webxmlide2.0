@@ -1,5 +1,0 @@
-<!ELEMENT manifest (project,files)>
-<!ELEMENT project name>
-<!ELEMENT name (#PCDATA)>
-<!ELEMENT files (xml,dtd?,xsd?,xslt?)>
-<!ELEMENT price (#PCDATA)>

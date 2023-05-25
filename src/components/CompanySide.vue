@@ -245,7 +245,7 @@ export default {
             handler: function(){
                 this.xsltCode = this.xslt_code;
             }
-        },
+        },*/
         dtd_filename:{
             handler: function () {
                 this.fileNameDTD = this.dtd_filename;
@@ -260,7 +260,7 @@ export default {
             handler: function () {
                 this.fileNameXSLT = this.xslt_filename;
             }
-        },*/
+        },
         dtd_active: {
             handler: function(){
                 if(this.dtd_active){

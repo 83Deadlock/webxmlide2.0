@@ -207,11 +207,16 @@ app.post('/validate-dtd', async (req, res) => {
     console.log('-#-#-#-#-#-#-#-#-#');
     res.send(responseObject);
 
+    fs.unlinkSync(dtd_path);
+    console.log("Temporary files deleted.");
+
   } catch (error) {
     console.error(error);
     res.send({ valid: false, correct: false });
   }
 });
+
+var temp_id = 0;
 
 app.post('/dtd-to-xsd', async (req, res) => {
   let logStr = "\n\n\nPOST ON /dtd-to-xsd";
@@ -223,13 +228,17 @@ app.post('/dtd-to-xsd', async (req, res) => {
   }
 
   let xsdFileName = dtdFileName.replace(".dtd", ".xsd");
+  dtdFileName = dtdFileName.replace(".dtd", `_${temp_id}.dtd`)
+  let tempXSDFileName = xsdFileName.replace(".xsd", `_${temp_id}.xsd`);
+
+  temp_id += 1;
 
   try {
 
     // Creating DTD Temp file and XSD Path
 
     const dtd_path = path.join(__dirname, 'temp', dtdFileName);
-    const xsd_path = path.join(__dirname, 'temp', xsdFileName);
+    const xsd_path = path.join(__dirname, 'temp', tempXSDFileName);
 
     const jar_path = path.join(__dirname, 'trang.jar');
 
@@ -243,23 +252,38 @@ app.post('/dtd-to-xsd', async (req, res) => {
           reject(err);
         } else {
           logStr += "\n\t[DTD Temp File Saved]";
-          const { exec } = require('child_process');
-
-          exec(`java -jar ${jar_path} ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
-            if (err) {
-              console.error(`Trang execution failed: ${err}`);
-              return;
-            }
-            logStr += "SUCCESS!";
-          });
           resolve();
         }
       });
     });
 
-    let result = fs.readFileSync(xsd_path).toString();
+    await new Promise((resolve, reject) => {
+      const { exec } = require('child_process');
+
+      exec(`java -jar ${jar_path} ${dtd_path} ${xsd_path}`, (err, stdout, stderr) => {
+        if (err) {
+          console.error(`Trang execution failed: ${err}`);
+          logStr += `NO SUCCESS! ${err}`;
+
+          reject(err);
+        }
+        logStr += "SUCCESS!";
+        console.log("TRANG SUCCESS");
+        resolve();
+      });
+    });
+
+
+    console.log(fs.readFileSync(xsd_path).toString());
+
+    const result = fs.readFileSync(xsd_path).toString();
     console.log(logStr);
     res.send({ xsd_code: result, xsd_filename: xsdFileName });
+
+    fs.unlinkSync(dtd_path);
+    fs.unlinkSync(xsd_path);
+    console.log("Temporary files deleted.");
+
 
   } catch (error) {
     console.error(error);
@@ -313,7 +337,6 @@ app.post('/run-xpath', async (req, res) => {
   console.log(logStr);
   res.send({ output: outputStr })
 });
-
 
 app.post('/validate-xsd', async (req, res) => {
   let logStr = "\n\n\nPOST ON /validate-xsd";
@@ -450,6 +473,9 @@ app.post('/validate-xsd', async (req, res) => {
     console.log("\n\t[SERVER RESPONSE] ", responseObject);
     console.log('-#-#-#-#-#-#-#-#-#');
     res.send(responseObject);
+
+    fs.unlinkSync(xsd_path);
+    console.log("Temporary files deleted.");
 
   } catch (error) {
     console.error(error);
