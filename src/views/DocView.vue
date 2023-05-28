@@ -1,4 +1,6 @@
 <template>
+  <div class="docs">
+    <h1 id="tutorials">Tutorials</h1>
     <div class="single-row-cards">
       <div class="card">
         <div class="card-title">
@@ -35,7 +37,23 @@
         <button role="link"
       @click="openInNewTab('https://www.w3schools.com/xml/xpath_intro.asp')">XPath Tutorial</button>
       </div>
-    </div>  
+    </div> 
+    <h1 id="examples">Examples</h1>
+    <div class="single-row-cards">
+      <div class="card">
+        <div class="card-title">
+          <h1>Bookstore</h1>
+        </div>
+        <button role="link" @click="bookstoreClick">Show Example</button>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <h1>PRH_EXample</h1>
+        </div>
+        <button role="link" @click="bookstoreClick">Show Example</button>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 export default {
@@ -43,13 +61,26 @@ export default {
     openInNewTab(url) {
       window.open(url, '_blank', 'noreferrer');
     },
+    bookstoreClick() {
+      console.log("Bookstore Example");
+    }
   },
 };
 </script>
 <style scoped>
+.docs{
+  display: flex;
+  flex-direction: column;
+  font-family: 'Euclid';
+  margin-bottom: 3vh;
+}
 
+.docs > h1 {
+  padding-left: 30px;
+  padding-right: 30px;  
+  margin-bottom: 0;
+}
 .single-row-cards{
-  font-family: "Euclid";
   display: grid;
 
   grid-template-columns: repeat(5, 1fr);
