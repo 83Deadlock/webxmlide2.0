@@ -48,6 +48,35 @@
         <button role="link" @click="bookstoreClick">Show Example</button>
       </div>-->
     </div>
+    <h1 id="project-upload">Project Upload</h1>
+    <div class="projup">
+      <p>To upload a project into the IDE, use the "Upload" button at the top right of the page. 
+        <br>The uploaded project should be in a .zip folder. 
+        <br>The .zip folder should contain a <span>manifest.xml</span> file and a folder called "src" containing the project files.
+        <br> <br>The following project structure should have the given <span>manifest.xml</span>:<br>
+        <br><em>bookstore.zip</em><br>
+        | -> <b>manifest.xml</b><br>
+        | -> <em>src</em><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| -> <b>bookstore.xml</b><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| -> <b>bookstore.dtd</b><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| -> <b>bookstore.xsd</b><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| -> <b>bookstore.xslt</b><br>
+
+      </p>
+
+      <div class="xml-manifest">
+        <p>&lt;?xml version="1.0" encoding="UTF-8"?><br>
+          <span>&lt;project <span id="attribute">name</span>=<span id="attribute_value">"bookstore"</span>></span><br>
+          &nbsp;&nbsp;<span>&lt;src></span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span>&lt;xml></span>bookstore.xml<span>&lt;/xml></span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span>&lt;dtd></span>bookstore.dtd<span>&lt;/dtd></span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span>&lt;xsd></span>bookstore.xsd<span>&lt;/xsd></span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span>&lt;xslt></span>bookstore.xslt<span>&lt;/xslt></span><br>
+          &nbsp;&nbsp;<span>&lt;/src></span><br>
+          <span>&lt;/project></span>
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -102,7 +131,7 @@ export default {
   display: flex;
   flex-direction: column;
   font-family: 'Euclid';
-  margin-bottom: 3vh;
+  margin-bottom: 6vh;
 }
 
 .docs>h1 {
@@ -160,4 +189,32 @@ button {
 button:hover {
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
+
+.projup > p {
+  padding-left: 30px;
+}
+
+.projup span {
+  color: #0092b2;
+}
+
+.xml-manifest span {
+  color: #0092b2;
+}
+
+#attribute {
+  color: orangered;
+}
+
+#attribute_value {
+  color: darkgreen;
+}
+
+.xml-manifest{
+  background-color: #111111;
+  width: 40vw;
+  margin-left: 30px;
+  padding: 1vh;
+}
+
 </style>
