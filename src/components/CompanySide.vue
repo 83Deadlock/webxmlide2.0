@@ -179,8 +179,21 @@ export default {
                 link.href = window.URL.createObjectURL(blob);
                 link.click();
 
+            } else if(this.xsltActive){
+                code = this.xslt_code;
+                filename = this.xslt_filename;
+                if(filename == ''){
+                    filename = 'Example.xslt';
+                }
+
+                const blob = new Blob([code], {type: 'text/xslt'});
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = window.URL.createObjectURL(blob);
+                link.click();
+
             } else {
-                console.log("NOT IMPLEMENTED YET!");
+                console.log("ERROR");
             }
         },
         handleFileInputChange(event) {

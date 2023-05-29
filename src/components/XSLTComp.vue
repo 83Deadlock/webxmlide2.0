@@ -67,14 +67,14 @@ export default {
 }
 
 .xslt-output>p {
-    padding: 10px;
+    /*padding: 10px;*/
     color: #c3c3c3;
 }
 
 .scrollable-text {
     padding-left: 15px;
     color: #c3c3c3;
-    white-space: pre-line;
+    /*white-space: pre-line;*/
     overflow-wrap: break-word;
     /* Wrap long lines */
 }

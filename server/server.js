@@ -513,6 +513,46 @@ app.post('/validate-xslt', async (req, res) => {
   }
 });
 
+app.get('/bookstore-example', async (req,res) => {
+  const examplesDir = path.join(__dirname, 'examples', 'bookstore');
+  const xmlFilePath = path.join(examplesDir, 'bookstore.xml');
+  const dtdFilePath = path.join(examplesDir, 'bookstore.dtd');
+  const xsdFilePath = path.join(examplesDir, 'bookstore.xsd');
+  const xsltFilePath = path.join(examplesDir, 'bookstore.xslt');
+
+  try {
+    const xml = fs.readFileSync(xmlFilePath, 'utf-8');
+    const dtd = fs.readFileSync(dtdFilePath, 'utf-8');
+    const xsd = fs.readFileSync(xsdFilePath, 'utf-8');
+    const xslt = fs.readFileSync(xsltFilePath, 'utf-8');
+
+    const xml_filename = path.basename(xmlFilePath);
+    const dtd_filename = path.basename(dtdFilePath);
+    const xsd_filename = path.basename(xsdFilePath);
+    const xslt_filename = path.basename(xsltFilePath);
+
+    // Do something with the file contents and filenames
+
+    const responseObject = {
+      xml_code: xml,
+      xml_filename,
+      dtd_code: dtd,
+      dtd_filename,
+      xsd_code: xsd,
+      xsd_filename,
+      xslt_code: xslt,
+      xslt_filename
+    };
+
+    res.status(200).json(responseObject);
+
+  } catch (error) {
+    console.error('Error reading files:', error);
+    res.status(500).json({ error: 'Failed to read files' });
+  }
+
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
